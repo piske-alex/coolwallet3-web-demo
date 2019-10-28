@@ -4,12 +4,13 @@
   "private": true,
   "dependencies": {
     "bootstrap": "^4.3.1",
+    "cws-eth": "file:../coolwalletsjs/packages/cws-eth",
     "cws-web-ble": "file:../coolwalletsjs/packages/transport-web-ble",
-    "cws-sdk-core": "file:../coolwalletsjs/packages/sdk-core",
     "react": "^16.11.0",
     "react-bootstrap": "^1.0.0-beta.14",
     "react-dom": "^16.11.0",
-    "react-scripts": "3.2.0"
+    "react-scripts": "3.2.0",
+    "sdk-core": "file:../coolwalletsjs/packages/sdk-core"
   },
   "scripts": {
     "start": "react-scripts start",
