@@ -1,4 +1,4 @@
-import { generateKeyPair } from 'cws-sdk-core'
+import { generateKeyPair } from 'sdk-core'
 
 export const getAppKeysOrGenerate = () => {
   let appPublicKey = localStorage.getItem('appPublicKey')
@@ -13,4 +13,12 @@ export const getAppKeysOrGenerate = () => {
   localStorage.setItem('appPublicKey', keyPair.publicKey)
   localStorage.setItem('appPrivateKey', keyPair.privateKey)
   return { appPublicKey: keyPair.publicKey, appPrivateKey: keyPair.privateKey }
+}
+
+export const getAppIdOrNull = () => {
+  const appId = localStorage.getItem('appId');
+  if(appId === null) {
+    console.log('No Appid stored, please register!')
+  }
+  return appId
 }

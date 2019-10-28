@@ -1,46 +1,78 @@
 import React, { Component } from 'react'
-import Button from 'react-bootstrap/Button'
-import { WebBleTransport } from 'cws-web-ble'
-import { CWSDevice } from 'cws-sdk-core'
-import { getAppKeysOrGenerate } from './sdkUtil';
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
+import Button from 'react-bootstrap/Button'
+import { getAppKeysOrGenerate, getAppIdOrNull } from './sdkUtil';
+
+import { WebBleTransport } from 'cws-web-ble'
+import { CWSDevice } from 'sdk-core'
+import cwsETH from 'cws-eth'
+
 const transport = new WebBleTransport();
 
 const { appPublicKey, appPrivateKey } = getAppKeysOrGenerate();
-const core =  new CWSDevice(transport, appPublicKey, appPrivateKey)
+const appId = getAppIdOrNull()
+const device =  new CWSDevice(transport, appPublicKey, appPrivateKey, appId)
+const ETH = new cwsETH(transport, appPrivateKey, appId)
 
 class Ble extends Component {
 
+	getPassword = () => {
+		device.getPairingPassword().then(pwd=>{
+			console.log(`Got pairing password: ${pwd}`)
+		})
+	}
+
   render() {
     return (
-      // <div id="bleTest" width="640" height="480">
       <Container>
 		  <Row>
 		  	<Button onClick={transport.connect}>Connect</Button>
+			<Button onClick={transport.disconnect}> Disconnect</Button>
 		  </Row>
 		  <Row>
 		  	<Button onClick={ () => {
-				  core.getSEVersion()
+				  device.getSEVersion().then(version=>{
+					  console.log(`Got SE Version: ${version}`)
+				  })
 			}}>SE Version</Button>
 		  </Row>
 		  <Row>
 		  	<Button onClick={ () => {
-				  core.resetCard()
+				  device.resetCard()
 			}}>Reset</Button>
 		  </Row>
 		  <Row>
 		  	<Button onClick={ () => {
-				  core.registerDevice('123456', 'myChromeExt').then(appId => {
+				  device.registerDevice('123456', 'myChromeExt').then(appId => {
 					  localStorage.setItem("appId", appId)
+					  device.setAppId(appId)
 					  console.log(`Store AppId complete! ${appId}`)
 				  })
 			}}>Register</Button>
 		  </Row>
 		  <Row>
-			  <Button onClick={transport.disconnect}> Disconnect</Button>
+			  <Button onClick={this.getPassword}> Get password</Button>
 		  </Row>
-	  </Container>
+		  <h3>Ethereum Test</h3>
+		  <Row>
+			  <Button onClick={()=>{
+				  ETH.getAddress(0).then(addr=>{
+					  console.log(`Got address => ${addr}`)
+				  })
+			  }}> getAddress </Button>
+		  </Row>
+		  <Row>
+			  <Button onClick={()=>{
+				  const payload = "eb81f884b2d05e00825208940644de2a0cf3f11ef6ad89c264585406ea346a96870107c0e2fc200080018080";
+				  const publicKey = "033a057e1f19ea73423bd75f4d391dd28145636081bf0c2674f89fd6d04738f293";
+				  const addressIndex = 0;
+				  ETH.signTransaction(payload, addressIndex, publicKey).then(hex=>{
+					  console.log(`signed Hex: ${hex}`)
+				  })
+			  }}> Sign Transfer! </Button>
+		  </Row>
+	  </Container>	  
         
     )
   }
