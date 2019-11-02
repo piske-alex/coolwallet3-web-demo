@@ -4,9 +4,9 @@ import Row from 'react-bootstrap/Row'
 import Button from 'react-bootstrap/Button'
 import { getAppKeysOrGenerate, getAppIdOrNull } from './sdkUtil';
 
-import WebBleTransport from 'cws-web-ble'
-import { CWSDevice } from 'sdk-core'
-import cwsETH from 'cws-eth'
+import WebBleTransport from '@coolwallets/transport-web-ble'
+import { CWSDevice } from '@coolwallets/sdk-core'
+import cwsETH from '@coolwallets/eth'
 
 const transport = new WebBleTransport();
 
@@ -44,7 +44,7 @@ class Ble extends Component {
 		  </Row>
 		  <Row>
 		  	<Button onClick={ () => {
-				  device.register(appPublicKey, '123456', 'myChromeExt').then(appId => {
+				  device.register(appPublicKey, '83239194', 'myChromeExt').then(appId => {
 					  localStorage.setItem("appId", appId)
 					  device.setAppId(appId)
 					  console.log(`Store AppId complete! ${appId}`)

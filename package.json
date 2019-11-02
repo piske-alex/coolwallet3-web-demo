@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "bootstrap": "^4.3.1",
-    "@coolwallets/eth": "^0.0.2",
+    "@coolwallets/eth": "^0.0.3",
     "@coolwallets/transport-web-ble": "^0.0.2",
+    "@coolwallets/sdk-core": "^0.0.2",
+    "bootstrap": "^4.3.1",
     "react": "^16.11.0",
     "react-bootstrap": "^1.0.0-beta.14",
     "react-dom": "^16.11.0",
-    "react-scripts": "3.2.0",
-    "sdk-core": "file:../coolwalletsjs/packages/sdk-core"
+    "react-scripts": "3.2.0"
   },
   "scripts": {
     "start": "react-scripts start",

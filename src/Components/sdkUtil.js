@@ -1,4 +1,4 @@
-import { generateKeyPair } from 'sdk-core'
+import { generateKeyPair } from '@coolwallets/sdk-core'
 
 export const getAppKeysOrGenerate = () => {
   let appPublicKey = localStorage.getItem('appPublicKey')
