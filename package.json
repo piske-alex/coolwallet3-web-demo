@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "bootstrap": "^4.3.1",
-    "cws-eth": "file:../coolwalletsjs/packages/cws-eth",
-    "cws-web-ble": "file:../coolwalletsjs/packages/transport-web-ble",
+    "@coolwallets/eth": "^0.0.2",
+    "@coolwallets/transport-web-ble": "^0.0.2",
     "react": "^16.11.0",
     "react-bootstrap": "^1.0.0-beta.14",
     "react-dom": "^16.11.0",
