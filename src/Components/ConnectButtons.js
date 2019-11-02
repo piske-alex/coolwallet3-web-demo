@@ -4,7 +4,7 @@ import Row from 'react-bootstrap/Row'
 import Button from 'react-bootstrap/Button'
 import { getAppKeysOrGenerate, getAppIdOrNull } from './sdkUtil';
 
-import { WebBleTransport } from 'cws-web-ble'
+import WebBleTransport from 'cws-web-ble'
 import { CWSDevice } from 'sdk-core'
 import cwsETH from 'cws-eth'
 
@@ -12,7 +12,7 @@ const transport = new WebBleTransport();
 
 const { appPublicKey, appPrivateKey } = getAppKeysOrGenerate();
 const appId = getAppIdOrNull()
-const device =  new CWSDevice(transport, appPublicKey, appPrivateKey, appId)
+const device =  new CWSDevice(transport, appPrivateKey, appId)
 const ETH = new cwsETH(transport, appPrivateKey, appId)
 
 class Ble extends Component {
@@ -44,7 +44,7 @@ class Ble extends Component {
 		  </Row>
 		  <Row>
 		  	<Button onClick={ () => {
-				  device.registerDevice('123456', 'myChromeExt').then(appId => {
+				  device.register(appPublicKey, '123456', 'myChromeExt').then(appId => {
 					  localStorage.setItem("appId", appId)
 					  device.setAppId(appId)
 					  console.log(`Store AppId complete! ${appId}`)
@@ -65,9 +65,9 @@ class Ble extends Component {
 		  <Row>
 			  <Button onClick={()=>{
 				  const payload = "eb81f884b2d05e00825208940644de2a0cf3f11ef6ad89c264585406ea346a96870107c0e2fc200080018080";
-				  const publicKey = "033a057e1f19ea73423bd75f4d391dd28145636081bf0c2674f89fd6d04738f293";
+				//   const publicKey = "033a057e1f19ea73423bd75f4d391dd28145636081bf0c2674f89fd6d04738f293";
 				  const addressIndex = 0;
-				  ETH.signTransaction(payload, addressIndex, publicKey).then(hex=>{
+				  ETH.signTransaction(payload, addressIndex).then(hex=>{
 					  console.log(`signed Hex: ${hex}`)
 				  })
 			  }}> Sign Transfer! </Button>
