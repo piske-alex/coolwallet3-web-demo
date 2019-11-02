@@ -4,8 +4,9 @@
   "private": true,
   "dependencies": {
     "@coolwallets/eth": "^0.0.3",
+    "@coolwallets/sdk-core": "file:../coolwalletsjs/packages/sdk-core",
     "@coolwallets/transport-web-ble": "^0.0.2",
-    "@coolwallets/sdk-core": "^0.0.2",
+    "bip39": "^3.0.2",
     "bootstrap": "^4.3.1",
     "react": "^16.11.0",
     "react-bootstrap": "^1.0.0-beta.14",
