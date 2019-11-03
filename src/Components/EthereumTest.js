@@ -32,9 +32,11 @@ class EthTest extends Component {
     console.log(this.state)
     return (
       <Container>
-        <h3>Ethereum Test</h3>
+        <h4>Ethereum Tx</h4>
         <Row>
           <Button
+            variant='outline-success'
+            style={{ margin: 20 }}
             onClick={() => {
               this.props.ETH.getAddress(0).then(addr => {
                 console.log(`Got address => ${addr}`)
@@ -43,18 +45,21 @@ class EthTest extends Component {
           >
             getAddress
           </Button>
-        </Row>
-        <Row>
+
           <Button
+            variant='outline-success'
+            style={{ margin: 20 }}
             onClick={() => {
               const payload = 'eb81f884b2d05e00825208940644de2a0cf3f11ef6ad89c264585406ea346a96870107c0e2fc200080018080'
-                // const publicKey = "033a057e1f19ea73423bd75f4d391dd28145636081bf0c2674f89fd6d04738f293";
+              // const publicKey = "033a057e1f19ea73423bd75f4d391dd28145636081bf0c2674f89fd6d04738f293";
               const addressIndex = 0
               this.props.ETH.signTransaction(payload, addressIndex).then(hex => {
                 console.log(`signed Hex: ${hex}`)
               })
             }}
-          > Sign Transfer!
+          >
+            {' '}
+            Sign Transfer
           </Button>
         </Row>
       </Container>

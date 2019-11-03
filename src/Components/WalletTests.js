@@ -9,7 +9,6 @@ import Container from 'react-bootstrap/Container'
 
 const bip39 = require('bip39')
 
-
 class WalletTest extends Component {
   state = {
     mnemonic: '',
@@ -36,9 +35,9 @@ class WalletTest extends Component {
   render() {
     return (
       <Container>
-        <h3> Wallet Utils </h3>
+        <h4> About Wallet </h4>
         <Row>
-          <InputGroup className='mb-3'>
+          <InputGroup className='mb-3' style={{ margin: 20 }}>
             <FormControl
               onChange={this.onchange}
               value={this.state.mnemonic}
@@ -46,7 +45,7 @@ class WalletTest extends Component {
               aria-describedby='basic-addon2'
             />
             <InputGroup.Append>
-              <Button variant='outline-secondary' mode='contained' compact='true' onClick={this.setMnemonic}>
+              <Button variant="outline-light" mode='contained' compact='true' onClick={this.setMnemonic}>
                 Set Seed
               </Button>
             </InputGroup.Append>

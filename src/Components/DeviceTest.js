@@ -16,17 +16,7 @@ class Device extends Component {
         <h4>Device</h4>
         <Row>
           <Button
-            style={{ margin: 20 }}
-            onClick={() => {
-              this.props.device.getSEVersion().then(version => {
-                console.log(`Got SE Version: ${version}`)
-              })
-            }}
-          >
-            SE Version
-          </Button>
-
-          <Button
+            variant='outline-danger'
             style={{ margin: 20 }}
             onClick={() => {
               this.props.device.resetCard()
@@ -34,10 +24,9 @@ class Device extends Component {
           >
             Reset
           </Button>
-        </Row>
-        <Row>
           <Button
             style={{ margin: 20 }}
+            variant='outline-light'
             onClick={() => {
               this.props.device.register(this.props.appPublicKey, '83239194', 'myChromeExt').then(appId => {
                 localStorage.setItem('appId', appId)
@@ -49,7 +38,7 @@ class Device extends Component {
             Register
           </Button>
 
-          <Button style={{ margin: 20 }} onClick={this.getPassword}>
+          <Button variant='outline-light' style={{ margin: 20 }} onClick={this.getPassword}>
             {' '}
             Get password
           </Button>
