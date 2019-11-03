@@ -34,7 +34,6 @@ class WalletTest extends Component {
   }
 
   render() {
-    console.log(this.state)
     return (
       <Container>
         <h3> Wallet Utils </h3>

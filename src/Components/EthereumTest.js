@@ -48,7 +48,7 @@ class EthTest extends Component {
           <Button
             onClick={() => {
               const payload = 'eb81f884b2d05e00825208940644de2a0cf3f11ef6ad89c264585406ea346a96870107c0e2fc200080018080'
-              //   const publicKey = "033a057e1f19ea73423bd75f4d391dd28145636081bf0c2674f89fd6d04738f293";
+                // const publicKey = "033a057e1f19ea73423bd75f4d391dd28145636081bf0c2674f89fd6d04738f293";
               const addressIndex = 0
               this.props.ETH.signTransaction(payload, addressIndex).then(hex => {
                 console.log(`signed Hex: ${hex}`)
