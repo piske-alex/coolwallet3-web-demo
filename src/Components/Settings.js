@@ -3,9 +3,9 @@ import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Button from 'react-bootstrap/Button'
 
-class Device extends Component {
+class SettingPage extends Component {
   getPassword = () => {
-    this.props.device.getPairingPassword().then(pwd => {
+    this.props.hardware.getPairingPassword().then(pwd => {
       console.log(`Got pairing password: ${pwd}`)
     })
   }
@@ -13,13 +13,13 @@ class Device extends Component {
   render() {
     return (
       <Container>
-        <h4>Device</h4>
+        <h4>Settings</h4>
         <Row>
           <Button
             variant='outline-danger'
             style={{ margin: 20 }}
             onClick={() => {
-              this.props.device.resetCard()
+              this.props.hardware.resetCard()
             }}
           >
             Reset
@@ -28,9 +28,9 @@ class Device extends Component {
             style={{ margin: 20 }}
             variant='outline-light'
             onClick={() => {
-              this.props.device.register(this.props.appPublicKey, '83239194', 'myChromeExt').then(appId => {
+              this.props.hardware.register(this.props.appPublicKey, '83239194', 'myChromeExt').then(appId => {
                 localStorage.setItem('appId', appId)
-                this.props.device.setAppId(appId)
+                this.props.hardware.setAppId(appId)
                 console.log(`Store AppId complete! ${appId}`)
               })
             }}
@@ -48,4 +48,4 @@ class Device extends Component {
   }
 }
 
-export default Device
+export default SettingPage

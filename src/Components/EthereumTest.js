@@ -29,7 +29,6 @@ class EthTest extends Component {
   }
 
   render() {
-    console.log(this.state)
     return (
       <Container>
         <h4>Ethereum Tx</h4>

@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@coolwallets/eth": "0.0.5",
-    "@coolwallets/sdk-core": "0.0.3",
+    "@coolwallets/eth": "0.0.6",
+    "@coolwallets/wallet": "0.0.1",
     "@coolwallets/transport-web-ble": "^0.0.2",
     "bip39": "^3.0.2",
     "bootstrap": "^4.3.1",
