@@ -12,8 +12,6 @@ import GasMenu from './GasMenu'
 
 const web3 = new Web3('https://mainnet.infura.io/v3/44fd23cda65746a699a5d3c0e2fa45d5')
 
-const EthereumTx = require('ethereumjs-tx').Transaction
-
 class EthTest extends Component {
   constructor(props) {
     super(props)
@@ -22,12 +20,12 @@ class EthTest extends Component {
 
   state = {
     addressIndex: 0,
-    gasPrice: 0,
+    gasPrice: 10,
     nonce: 0,
     address: '',
     to: '',
     value: '0',
-    data: null,
+    data: '0x00',
   }
 
   getAddress = () => {
@@ -36,7 +34,6 @@ class EthTest extends Component {
       this.setState({ address })
       web3.eth.getTransactionCount(address, "pending").then(nonce => {
         this.setState({ nonce })
-        console.log(this.state)
       })
     })
   }
@@ -50,25 +47,19 @@ class EthTest extends Component {
 
   sendTransaction = () => {
     const { addressIndex, to, nonce, value, data, gasPrice } = this.state
+    const gasLimitHex = '0x5208';
+    const gasPriceHex = web3.utils.toHex(web3.utils.toWei(gasPrice.toString(), 'Gwei'))
+
     const param = {
-      nonce: web3.utils.toHex(nonce+1),
-      gasPrice: web3.utils.toHex(web3.utils.toWei(gasPrice.toString(), 'Gwei')),
-      gasLimit: '0x5208',
-      to: to,
+      nonce: web3.utils.toHex(nonce),
+      gasPrice: gasPriceHex,
+      gasLimit: gasLimitHex,
+      to,
       value: web3.utils.toHex(web3.utils.toWei(value.toString(), 'ether')),
       data,
-      chainId: 3
     }
-    console.log(gasPrice.toString())
-    console.log(web3.utils.toHex(web3.utils.toWei(gasPrice.toString(), 'gwei')))
-    console.log(web3.utils.toHex(web3.utils.toWei(value.toString(), 'ether')))
-    const tx = new EthereumTx(param)
-    console.log(tx)
-    const payload = tx.serialize().toString('hex')
-    console.log(payload)
-    // const payload = 'eb81f884b2d05e00825208940644de2a0cf3f11ef6ad89c264585406ea346a96870107c0e2fc200080018080'
-    this.props.ETH.signTransaction(payload, addressIndex).then(hex => {
-      console.log(`signed Hex: ${hex}`)
+    this.props.ETH.signTransaction(param, addressIndex).then(hex => {
+      console.log(`Signed hex ${hex}`)
     })
   }
 
