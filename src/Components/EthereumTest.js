@@ -10,14 +10,14 @@ import Form from 'react-bootstrap/Form'
 import Web3 from 'web3'
 import GasMenu from './GasMenu'
 
-const web3 = new Web3('https://mainnet.infura.io/v3/44fd23cda65746a699a5d3c0e2fa45d5')
+const web3 = new Web3('https://ropsten.infura.io/v3/44fd23cda65746a699a5d3c0e2fa45d5')
 
 class EthTest extends Component {
   constructor(props) {
     super(props)
     this.gasHandler = this.gasHandler.bind(this)
   }
-
+  
   state = {
     addressIndex: 0,
     gasPrice: 10,
@@ -26,28 +26,29 @@ class EthTest extends Component {
     to: '',
     value: '0',
     data: '0x00',
+    signedTx: '',
   }
 
   getAddress = () => {
     const addressIdx = parseInt(this.state.addressIndex)
     this.props.ETH.getAddress(addressIdx).then(address => {
       this.setState({ address })
-      web3.eth.getTransactionCount(address, "pending").then(nonce => {
+      web3.eth.getTransactionCount(address, 'pending').then(nonce => {
         this.setState({ nonce })
       })
     })
   }
 
   gasHandler = gasPrice => {
-    const gasPriceInGWei = gasPrice/10
+    const gasPriceInGWei = gasPrice / 10
     this.setState({
       gasPrice: gasPriceInGWei,
     })
   }
 
-  sendTransaction = () => {
+  signTx = () => {
     const { addressIndex, to, nonce, value, data, gasPrice } = this.state
-    const gasLimitHex = '0x5208';
+    const gasLimitHex = '0x5208'
     const gasPriceHex = web3.utils.toHex(web3.utils.toWei(gasPrice.toString(), 'Gwei'))
 
     const param = {
@@ -58,12 +59,13 @@ class EthTest extends Component {
       value: web3.utils.toHex(web3.utils.toWei(value.toString(), 'ether')),
       data,
     }
-    this.props.ETH.signTransaction(param, addressIndex).then(hex => {
-      console.log(`Signed hex ${hex}`)
+    this.props.ETH.signTransaction(param, addressIndex).then(signedTx => {
+      this.setState({ signedTx })
     })
   }
 
   render() {
+    
     return (
       <Container style={{ textAlign: 'left' }}>
         <h4 style={{ margin: 20 }}>Ethereum Tx</h4>
@@ -122,11 +124,16 @@ class EthTest extends Component {
                   </Form.Group>
                 </Form.Row>
 
-                <Button variant='outline-success' onClick={this.sendTransaction}>
-                  {' '}
-                  Sign Test Transfer
+                <Button variant='outline-success' onClick={this.signTx} disabled={this.isSigning}>
+                  Sign Transaction
                 </Button>
               </Form>
+            </Col>
+          </Row>
+          <Row style={{ paddingTop: 20 }}>
+            <Col ms={12}>
+              <p style={{ textAlign: 'left', fontSize: 20 }}> Result: </p>
+              <p style={{ textAlign: 'left', fontSize: 13 }}> {this.state.signedTx} </p>
             </Col>
           </Row>
         </Container>
