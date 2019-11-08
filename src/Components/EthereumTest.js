@@ -20,6 +20,7 @@ class EthTest extends Component {
 
   state = {
     addressIndex: 0,
+    gasLimit: 21000,
     gasPrice: 10,
     nonce: 0,
     address: '',
@@ -48,21 +49,25 @@ class EthTest extends Component {
 
   signTx = () => {
     const { addressIndex, to, nonce, value, data, gasPrice } = this.state
-    const gasLimitHex = '0x5208'
-    const gasPriceHex = web3.utils.toHex(web3.utils.toWei(gasPrice.toString(), 'Gwei'))
-
-    const param = {
-      nonce: web3.utils.toHex(nonce),
-      gasPrice: gasPriceHex,
-      gasLimit: gasLimitHex,
-      to,
-      value: web3.utils.toHex(web3.utils.toWei(value.toString(), 'ether')),
-      data,
-    }
-    this.props.ETH.signTransaction(param, addressIndex).then(signedTx => {
-      web3.eth.sendSignedTransaction(signedTx, (err, txHash) => {
-        if (err) this.setState({ txHash: err.message })
-        this.setState({ txHash })
+    web3.eth.estimateGas({ to, data }, (_, gasLimit) => {
+      const gasLimitHex = web3.utils.toHex(gasLimit)
+      const gasPriceHex = web3.utils.toHex(web3.utils.toWei(gasPrice.toString(), 'Gwei'))
+      const param = {
+        nonce: web3.utils.toHex(nonce),
+        gasPrice: gasPriceHex,
+        gasLimit: gasLimitHex,
+        to,
+        value: web3.utils.toHex(web3.utils.toWei(value.toString(), 'ether')),
+        data,
+      }
+      this.props.ETH.signTransaction(param, addressIndex).then(signedTx => {
+        web3.eth.sendSignedTransaction(signedTx, (err, txHash) => {
+          if (err) {
+            console.error(err)
+            this.setState({ txHash: err.message })
+          }
+          this.setState({ txHash })
+        })
       })
     })
   }
