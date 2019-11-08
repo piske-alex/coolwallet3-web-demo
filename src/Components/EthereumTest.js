@@ -17,7 +17,7 @@ class EthTest extends Component {
     super(props)
     this.gasHandler = this.gasHandler.bind(this)
   }
-  
+
   state = {
     addressIndex: 0,
     gasPrice: 10,
@@ -26,7 +26,7 @@ class EthTest extends Component {
     to: '',
     value: '0',
     data: '0x00',
-    signedTx: '',
+    txHash: '',
   }
 
   getAddress = () => {
@@ -60,12 +60,14 @@ class EthTest extends Component {
       data,
     }
     this.props.ETH.signTransaction(param, addressIndex).then(signedTx => {
-      this.setState({ signedTx })
+      web3.eth.sendSignedTransaction(signedTx, (err, txHash) => {
+        if (err) this.setState({ txHash: err.message })
+        this.setState({ txHash })
+      })
     })
   }
 
   render() {
-    
     return (
       <Container style={{ textAlign: 'left' }}>
         <h4 style={{ margin: 20 }}>Ethereum Tx</h4>
@@ -124,16 +126,27 @@ class EthTest extends Component {
                   </Form.Group>
                 </Form.Row>
 
+                <Form.Row>
+                  <Form.Group as={Col}>
+                    <Form.Label>Data</Form.Label>
+                    <Form.Control
+                      onChange={event => {
+                        this.setState({ data: event.target.value })
+                      }}
+                      placeholder='0x...'
+                    />
+                  </Form.Group>
+                </Form.Row>
+
                 <Button variant='outline-success' onClick={this.signTx} disabled={this.isSigning}>
-                  Sign Transaction
+                  Sign & Send
                 </Button>
               </Form>
             </Col>
           </Row>
           <Row style={{ paddingTop: 20 }}>
             <Col ms={12}>
-              <p style={{ textAlign: 'left', fontSize: 20 }}> Result: </p>
-              <p style={{ textAlign: 'left', fontSize: 13 }}> {this.state.signedTx} </p>
+              <p style={{ textAlign: 'left', fontSize: 20 }}> Result: {this.state.txHash} </p>
             </Col>
           </Row>
         </Container>
