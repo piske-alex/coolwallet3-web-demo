@@ -10,6 +10,7 @@ import Form from 'react-bootstrap/Form'
 import Web3 from 'web3'
 import GasMenu from './GasMenu'
 
+const chainId = 3
 const web3 = new Web3('https://ropsten.infura.io/v3/44fd23cda65746a699a5d3c0e2fa45d5')
 
 class EthTest extends Component {
@@ -51,6 +52,7 @@ class EthTest extends Component {
         const gasLimitHex = web3.utils.toHex(gasLimit)
         const gasPriceHex = web3.utils.toHex(web3.utils.toWei(gasPrice.toString(), 'Gwei'))
         const param = {
+          chainId,
           nonce: web3.utils.toHex(nonce),
           gasPrice: gasPriceHex,
           gasLimit: gasLimitHex,

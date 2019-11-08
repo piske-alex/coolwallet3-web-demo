@@ -19,7 +19,7 @@ const { appPublicKey, appPrivateKey } = getAppKeysOrGenerate()
 const appId = getAppIdOrNull()
 const transport = new WebBleTransport()
 const wallet = new CoolWallet(transport, appPrivateKey, appId)
-const ETH = new cwsETH(transport, appPrivateKey, appId, 3)
+const ETH = new cwsETH(transport, appPrivateKey, appId)
 
 function App() {
   return (
