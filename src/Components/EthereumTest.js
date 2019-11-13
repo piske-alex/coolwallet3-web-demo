@@ -24,6 +24,7 @@ class EthTest extends Component {
     gasLimit: 21000,
     gasPrice: 10,
     nonce: 0,
+    balance: 0,
     address: '',
     to: '',
     value: '0',
@@ -35,6 +36,10 @@ class EthTest extends Component {
     const addressIdx = parseInt(this.state.addressIndex)
     this.props.ETH.getAddress(addressIdx).then(address => {
       this.setState({ address })
+      web3.eth.getBalance(address, "pending", (err, balance)=>{
+        console.log(`Update balance ${balance}`)
+        this.setState({balance: web3.utils.fromWei(balance)})
+      })
     })
   }
 
@@ -97,6 +102,7 @@ class EthTest extends Component {
             </Col>
             <Col>
               <FormText style={{ textAlign: 'left' }}> From {this.state.address} </FormText>
+              <FormText style={{ textAlign: 'left' }}> Balance: {this.state.balance} </FormText>
             </Col>
           </Row>
           {/* Sign Test Transfer */}

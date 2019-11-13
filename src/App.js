@@ -72,7 +72,7 @@ export default class App extends React.Component {
             </Row>
             <Row style={{ margin: 20 }}>
               <Col>
-                {/* <ETHTest ETH={ETH}></ETHTest> */}
+                <ETHTest ETH={ETH}></ETHTest>
               </Col>
             </Row>
           </Container>
