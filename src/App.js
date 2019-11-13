@@ -62,7 +62,7 @@ export default class App extends React.Component {
                 <Connection connect={this.connect} disconnect={this.disconnect}></Connection>
               </Col>
               <Col>
-                <Settings hardware={wallet} appPublicKey={appPublicKey}></Settings>
+                <Settings wallet={wallet} appPublicKey={appPublicKey}></Settings>
               </Col>
             </Row>
             <Row style={{ margin: 20 }}>
@@ -72,7 +72,7 @@ export default class App extends React.Component {
             </Row>
             <Row style={{ margin: 20 }}>
               <Col>
-                <ETHTest ETH={ETH}></ETHTest>
+                {/* <ETHTest ETH={ETH}></ETHTest> */}
               </Col>
             </Row>
           </Container>

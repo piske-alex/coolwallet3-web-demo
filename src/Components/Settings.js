@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button'
 
 class SettingPage extends Component {
   getPassword = () => {
-    this.props.hardware.getPairingPassword().then(pwd => {
+    this.props.wallet.getPairingPassword().then(pwd => {
       console.log(`Got pairing password: ${pwd}`)
     })
   }
@@ -19,7 +19,7 @@ class SettingPage extends Component {
             variant='outline-danger'
             style={{ margin: 20 }}
             onClick={() => {
-              this.props.hardware.resetCard()
+              this.props.wallet.resetCard()
             }}
           >
             Reset
@@ -28,9 +28,9 @@ class SettingPage extends Component {
             style={{ margin: 20 }}
             variant='outline-light'
             onClick={() => {
-              this.props.hardware.register(this.props.appPublicKey, '67771609', 'myChromeExt').then(appId => {
+              this.props.wallet.register(this.props.appPublicKey, '67771609', 'myChromeExt').then(appId => {
                 localStorage.setItem('appId', appId)
-                this.props.hardware.setAppId(appId)
+                this.props.wallet.setAppId(appId)
                 console.log(`Store AppId complete! ${appId}`)
               })
             }}
