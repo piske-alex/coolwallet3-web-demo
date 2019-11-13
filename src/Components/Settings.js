@@ -28,7 +28,7 @@ class SettingPage extends Component {
             style={{ margin: 20 }}
             variant='outline-light'
             onClick={() => {
-              this.props.hardware.register(this.props.appPublicKey, '83239194', 'myChromeExt').then(appId => {
+              this.props.hardware.register(this.props.appPublicKey, '67771609', 'myChromeExt').then(appId => {
                 localStorage.setItem('appId', appId)
                 this.props.hardware.setAppId(appId)
                 console.log(`Store AppId complete! ${appId}`)
