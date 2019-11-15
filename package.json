@@ -4,9 +4,9 @@
   "private": true,
   "dependencies": {
     "@coolwallets/devices": "^0.0.7",
-    "@coolwallets/eth": "0.1.1",
+    "@coolwallets/eth": "0.1.4",
     "@coolwallets/transport": "0.0.8",
-    "@coolwallets/transport-web-ble": "^0.0.10",
+    "@coolwallets/transport-web-ble": "0.0.16",
     "@coolwallets/wallet": "^0.0.1",
     "axios": "^0.19.0",
     "bip39": "^3.0.2",

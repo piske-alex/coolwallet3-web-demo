@@ -67,12 +67,12 @@ export default class App extends React.Component {
             </Row>
             <Row style={{ margin: 20 }}>
               <Col>
-                {/* <WalletTest wallet={wallet}></WalletTest> */}
+                <WalletTest wallet={wallet}></WalletTest>
               </Col>
             </Row>
             <Row style={{ margin: 20 }}>
               <Col>
-                {/* <ETHTest ETH={ETH}></ETHTest> */}
+                <ETHTest ETH={ETH}></ETHTest>
               </Col>
             </Row>
           </Container>

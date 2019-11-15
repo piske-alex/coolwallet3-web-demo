@@ -53,7 +53,10 @@ class EthTest extends Component {
   signTx = () => {
     const { addressIndex, to, value, data, gasPrice, address } = this.state
     web3.eth.getTransactionCount(address, 'pending').then(nonce => { // Get latest nonce
-      web3.eth.estimateGas({ to, data }, (_, gasLimit) => {         // Get gasLimit
+      web3.eth.estimateGas({ to, data }, (err, gasLimit) => {         // Get gasLimit
+        if (err) {
+          console.error(`estimate gas failed`, err)
+        }
         const gasLimitHex = web3.utils.toHex(gasLimit)
         const gasPriceHex = web3.utils.toHex(web3.utils.toWei(gasPrice.toString(), 'Gwei'))
         const param = {
@@ -65,6 +68,7 @@ class EthTest extends Component {
           value: web3.utils.toHex(web3.utils.toWei(value.toString(), 'ether')),
           data,
         }
+        console.log(param)
         this.props.ETH.signTransaction(param, addressIndex).then(signedTx => {
           web3.eth.sendSignedTransaction(signedTx, (err, txHash) => {
             if (err) { console.error(err) }
