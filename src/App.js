@@ -12,6 +12,7 @@ import ETHTest from './Components/EthereumTest'
 import CoolWallet from '@coolwallets/wallet'
 import cwsETH from '@coolwallets/eth'
 import WebBleTransport from '@coolwallets/transport-web-ble';
+import CoolWalletSBridge from './Components/bridge'
 import { getAppKeysOrGenerate, getAppIdOrNull } from './Utils/sdkUtil'
 
 const { appPublicKey, appPrivateKey } = getAppKeysOrGenerate()
@@ -48,6 +49,7 @@ export default class App extends React.Component {
 
   render() {
     const { transport } = this.state;
+    // const bridge = new CoolWalletSBridge()
     const wallet = new CoolWallet(transport, appPrivateKey, appId);
     const ETH = new cwsETH(transport, appPrivateKey, appId);
     return (
