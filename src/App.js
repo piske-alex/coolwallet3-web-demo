@@ -12,7 +12,6 @@ import ETHTest from './Components/EthereumTest'
 import CoolWallet from '@coolwallets/wallet'
 import cwsETH from '@coolwallets/eth'
 import WebBleTransport from '@coolwallets/transport-web-ble';
-import CoolWalletSBridge from './Components/bridge'
 import { getAppKeysOrGenerate, getAppIdOrNull } from './Utils/sdkUtil'
 
 const { appPublicKey, appPrivateKey } = getAppKeysOrGenerate()
