@@ -69,10 +69,11 @@ class WalletTest extends Component {
           </InputGroup>
         </Row>
         <Row>
+          
+          <InputGroup className='mb-3' style={{ margin: 20 }}>
           <Button variant="outline-light" mode='contained' compact='true' onClick={this.createWallet}>
                 Create Wallet By Card
               </Button>
-          <InputGroup className='mb-3' style={{ margin: 20 }}>
             <FormControl
               onChange={(event)=> {this.setState({sumOfSeed: event.target.value})}}
               value={this.state.sumOfSeed}
