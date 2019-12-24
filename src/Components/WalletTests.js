@@ -12,6 +12,7 @@ const bip39 = require('bip39')
 class WalletTest extends Component {
   state = {
     mnemonic: '',
+    sumOfSeed: 0
   }
   setMnemonic = () => {
     const mnemonic = this.state.mnemonic
@@ -25,6 +26,22 @@ class WalletTest extends Component {
       .catch(error => {
         console.log(error)
       })
+  }
+
+  createWallet = () => {
+    this.props.wallet
+      .createWallet(12)
+  }
+
+  sendCheckSum = () => {
+    const sum = parseInt(this.state.sumOfSeed);
+    console.log(`sum ${sum}, type ${typeof sum}`)
+    this.props.wallet
+    .sendCheckSum(sum).then(result => {
+      console.log(`send checksum success`)
+    }).catch(error=> {
+      console.error(error)
+    })
   }
 
   onchange = event => {
@@ -47,6 +64,24 @@ class WalletTest extends Component {
             <InputGroup.Append>
               <Button variant="outline-light" mode='contained' compact='true' onClick={this.setMnemonic}>
                 Set Seed
+              </Button>
+            </InputGroup.Append>
+          </InputGroup>
+        </Row>
+        <Row>
+          <Button variant="outline-light" mode='contained' compact='true' onClick={this.createWallet}>
+                Create Wallet By Card
+              </Button>
+          <InputGroup className='mb-3' style={{ margin: 20 }}>
+            <FormControl
+              onChange={(event)=> {this.setState({sumOfSeed: event.target.value})}}
+              value={this.state.sumOfSeed}
+              placeholder='Sum Of Seed'
+              aria-describedby='basic-addon2'
+            />
+            <InputGroup.Append>
+              <Button variant="outline-light" mode='contained' compact='true' onClick={this.sendCheckSum}>
+                Check Sum
               </Button>
             </InputGroup.Append>
           </InputGroup>
