@@ -2,12 +2,30 @@ import React, { Component } from 'react'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Button from 'react-bootstrap/Button'
+import { AlreadyRegistered } from '@coolwallets/errors'
 
 class SettingPage extends Component {
   getPassword = () => {
     this.props.wallet.getPairingPassword().then(pwd => {
       console.log(`Got pairing password: ${pwd}`)
     })
+  }
+
+  registerWithCard = () => {
+    this.props.wallet
+      .register(this.props.appPublicKey, '41799423', 'myChromeExt')
+      .then(appId => {
+        localStorage.setItem('appId', appId)
+        this.props.wallet.setAppId(appId)
+        console.log(`Store AppId complete! ${appId}`)
+      })
+      .catch(error => {
+        if (error instanceof AlreadyRegistered) {
+          console.log(`Already registered`)
+        } else {
+          console.error(error)
+        }
+      })
   }
 
   render() {
@@ -24,17 +42,7 @@ class SettingPage extends Component {
           >
             Reset
           </Button>
-          <Button
-            style={{ margin: 20 }}
-            variant='outline-light'
-            onClick={() => {
-              this.props.wallet.register(this.props.appPublicKey, '12345678', 'myChromeExt').then(appId => {
-                localStorage.setItem('appId', appId)
-                this.props.wallet.setAppId(appId)
-                console.log(`Store AppId complete! ${appId}`)
-              })
-            }}
-          >
+          <Button style={{ margin: 20 }} variant='outline-light' onClick={this.registerWithCard}>
             Register
           </Button>
 
