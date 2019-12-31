@@ -13,7 +13,7 @@ class SettingPage extends Component {
 
   registerWithCard = () => {
     this.props.wallet
-      .register(this.props.appPublicKey, '41799423', 'myChromeExt')
+      .register(this.props.appPublicKey, '12345678', 'myChromeExt')
       .then(appId => {
         localStorage.setItem('appId', appId)
         this.props.wallet.setAppId(appId)

@@ -156,6 +156,17 @@ class EthTest extends Component {
                   Sign & Send
                 </Button>
               </Form>
+
+              <Button variant='outline-success' onClick={
+                ()=>{
+                  const addrIndex =0
+                  const message = '436f6f6c57616c6c65744973436f6f6c'
+                  const publicKey= "033a057e1f19ea73423bd75f4d391dd28145636081bf0c2674f89fd6d04738f293"
+                  this.props.ETH.signMessage(message, addrIndex, publicKey).then(signature => {
+                    console.log(`signature`, signature)
+                  })
+                }
+              }> SignMessage </Button>
             </Col>
           </Row>
           <Row style={{ paddingTop: 20 }}>
