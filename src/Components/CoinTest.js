@@ -1,4 +1,8 @@
 import React, { Component } from 'react'
+
+import IconService from 'icon-sdk-js';
+// import IconService from 'icon-sdk-js/build/icon-sdk-js.web.min.js';
+
 import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -7,16 +11,22 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import FormControl from 'react-bootstrap/FormControl'
 import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Form'
-import Web3 from 'web3'
-import GasMenu from './GasMenu'
 
-const chainId = 3
-const web3 = new Web3('https://ropsten.infura.io/v3/44fd23cda65746a699a5d3c0e2fa45d5')
+const {
+  IconBuilder,
+  IconAmount,
+  IconConverter
+} = IconService;
+const version = 3;
+const network = 'https://wallet.icon.foundation/api/v3'
+const nid = 1
 
-class EthTest extends Component {
+const httpProvider = new IconService.HttpProvider(network);
+const iconService = new IconService(httpProvider);
+
+class CoinTest extends Component {
   constructor(props) {
     super(props)
-    this.gasHandler = this.gasHandler.bind(this)
   }
 
   state = {
@@ -28,55 +38,42 @@ class EthTest extends Component {
     address: '',
     to: '',
     value: '0',
-    data: '0x00',
     txHash: '',
   }
 
   getAddress = () => {
     const addressIdx = parseInt(this.state.addressIndex)
-    this.props.ETH.getAddress(addressIdx).then(address => {
+    this.props.Coin.getAddress(addressIdx).then(address => {
       this.setState({ address })
-      web3.eth.getBalance(address, "pending", (err, balance)=>{
-        console.log(`Update balance ${balance}`)
-        this.setState({balance: web3.utils.fromWei(balance)})
-      })
-    })
-  }
+      iconService.getBalance(address).execute().then(loopValue => {
+        const balance = IconAmount.of(loopValue, IconAmount.Unit.LOOP)
+        .convertUnit(IconAmount.Unit.ICX)
+        this.setState({balance})
+      });
 
-  gasHandler = gasPrice => {
-    const gasPriceInGWei = gasPrice / 10
-    this.setState({
-      gasPrice: gasPriceInGWei,
+      
+      // web3.eth.getBalance(address, "pending", (err, balance)=>{
+      //   console.log(`Update balance ${balance}`)
+      //   this.setState({balance: web3.utils.fromWei(balance)})
+      // })
     })
   }
 
   signTx = () => {
-    const { addressIndex, to, value, data, gasPrice, address } = this.state
-    web3.eth.getTransactionCount(address, 'pending').then(nonce => { // Get latest nonce
-      web3.eth.estimateGas({ to, data }, (err, gasLimit) => {         // Get gasLimit
-        if (err) {
-          console.error(`estimate gas failed`, err)
-        }
-        const gasLimitHex = web3.utils.toHex(gasLimit)
-        const gasPriceHex = web3.utils.toHex(web3.utils.toWei(gasPrice.toString(), 'Gwei'))
-        const param = {
-          chainId,
-          nonce: web3.utils.toHex(nonce),
-          gasPrice: gasPriceHex,
-          gasLimit: gasLimitHex,
-          to,
-          value: web3.utils.toHex(web3.utils.toWei(value.toString(), 'ether')),
-          data,
-        }
-        console.log(param)
-        this.props.ETH.signTransaction(param, addressIndex).then(signedTx => {
-          web3.eth.sendSignedTransaction(signedTx, (err, txHash) => {
-            if (err) { console.error(err) }
-            this.setState({ txHash })
-          })
-        })
-      })
-    })
+    const { addressIndex, to, value, address } = this.state
+    const txObj = new IconBuilder.IcxTransactionBuilder()
+      .from(address)
+      .to(to)
+      .value(IconAmount.of(value, IconAmount.Unit.ICX).toLoop())
+      .stepLimit(IconConverter.toBigNumber(100000))
+      .nid(IconConverter.toBigNumber(nid))
+      //   .nonce(IconConverter.toBigNumber(nonce))
+      .version(IconConverter.toBigNumber(version))
+      .timestamp(0)
+      .build();
+    // Returns raw transaction object
+    const rawTx = IconConverter.toRawTransaction(txObj);
+    // this.props.Coin.signTransaction(transaction, addressIndex, publicKey)
     
   }
 
@@ -134,10 +131,6 @@ class EthTest extends Component {
                       placeholder='Amount in Eth'
                     />
                   </Form.Group>
-                  <Form.Group as={Col}>
-                    <Form.Label> Gas (Gwei) </Form.Label>
-                    <GasMenu handler={this.gasHandler}></GasMenu>
-                  </Form.Group>
                 </Form.Row>
 
                 <Form.Row>
@@ -156,17 +149,6 @@ class EthTest extends Component {
                   Sign & Send
                 </Button>
               </Form>
-
-              <Button variant='outline-success' onClick={
-                ()=>{
-                  const addrIndex =0
-                  const message = '436f6f6c57616c6c65744973436f6f6c'
-                  const publicKey= "033a057e1f19ea73423bd75f4d391dd28145636081bf0c2674f89fd6d04738f293"
-                  this.props.ETH.signMessage(message, addrIndex, publicKey).then(signature => {
-                    console.log(`signature`, signature)
-                  })
-                }
-              }> SignMessage </Button>
             </Col>
           </Row>
           <Row style={{ paddingTop: 20 }}>
@@ -180,4 +162,4 @@ class EthTest extends Component {
   }
 }
 
-export default EthTest
+export default CoinTest

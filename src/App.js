@@ -7,10 +7,11 @@ import Col from 'react-bootstrap/Col'
 import Connection from './Components/Connection'
 import Settings from './Components/Settings'
 import WalletTest from './Components/WalletTests'
-import ETHTest from './Components/EthereumTest'
+import CoinTest from './Components/CoinTest'
 
 import CoolWallet from '@coolwallets/wallet'
-import cwsETH from '@coolwallets/eth'
+// import cwsETH from '@coolwallets/eth'
+import cwsICX from '@coolwallets/icx'
 import WebBleTransport from '@coolwallets/transport-web-ble';
 import { getAppKeysOrGenerate, getAppIdOrNull } from './Utils/sdkUtil'
 
@@ -50,7 +51,8 @@ export default class App extends React.Component {
     const { transport } = this.state;
     // const bridge = new CoolWalletSBridge()
     const wallet = new CoolWallet(transport, appPrivateKey, appId);
-    const ETH = new cwsETH(transport, appPrivateKey, appId);
+    // const ETH = new cwsETH(transport, appPrivateKey, appId);
+    const ICX = new cwsICX(transport, appPrivateKey, appId)
     return (
       <div className='App'>
         <header className='App-header'>
@@ -73,7 +75,7 @@ export default class App extends React.Component {
             </Row>
             <Row style={{ margin: 20 }}>
               <Col>
-                <ETHTest ETH={ETH}></ETHTest>
+                <CoinTest Coin={ICX}></CoinTest>
               </Col>
             </Row>
           </Container>
