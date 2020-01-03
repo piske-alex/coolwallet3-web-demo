@@ -1,8 +1,5 @@
 import React, { Component } from 'react'
 
-import IconService from 'icon-sdk-js';
-// import IconService from 'icon-sdk-js/build/icon-sdk-js.web.min.js';
-
 import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -12,28 +9,12 @@ import FormControl from 'react-bootstrap/FormControl'
 import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Form'
 
-const {
-  IconBuilder,
-  IconAmount,
-  IconConverter
-} = IconService;
-const version = 3;
-const network = 'https://wallet.icon.foundation/api/v3'
-const nid = 1
-
-const httpProvider = new IconService.HttpProvider(network);
-const iconService = new IconService(httpProvider);
+import { getIconBalance, getRawTransaction, sendTransaction } from './iconUtils'
 
 class CoinTest extends Component {
-  constructor(props) {
-    super(props)
-  }
 
   state = {
     addressIndex: 0,
-    gasLimit: 21000,
-    gasPrice: 10,
-    nonce: 0,
     balance: 0,
     address: '',
     to: '',
@@ -45,42 +26,26 @@ class CoinTest extends Component {
     const addressIdx = parseInt(this.state.addressIndex)
     this.props.Coin.getAddress(addressIdx).then(address => {
       this.setState({ address })
-      iconService.getBalance(address).execute().then(loopValue => {
-        const balance = IconAmount.of(loopValue, IconAmount.Unit.LOOP)
-        .convertUnit(IconAmount.Unit.ICX)
+      getIconBalance(address).then(balance => {
         this.setState({balance})
-      });
-
-      
-      // web3.eth.getBalance(address, "pending", (err, balance)=>{
-      //   console.log(`Update balance ${balance}`)
-      //   this.setState({balance: web3.utils.fromWei(balance)})
-      // })
+      })
     })
   }
 
-  signTx = () => {
+  signTx = async () => {
     const { addressIndex, to, value, address } = this.state
-    const txObj = new IconBuilder.IcxTransactionBuilder()
-      .from(address)
-      .to(to)
-      .value(IconAmount.of(value, IconAmount.Unit.ICX).toLoop())
-      .stepLimit(IconConverter.toBigNumber(100000))
-      .nid(IconConverter.toBigNumber(nid))
-      //   .nonce(IconConverter.toBigNumber(nonce))
-      .version(IconConverter.toBigNumber(version))
-      .timestamp(0)
-      .build();
-    // Returns raw transaction object
-    const rawTx = IconConverter.toRawTransaction(txObj);
-    // this.props.Coin.signTransaction(transaction, addressIndex, publicKey)
-    
+    const rawTx = await getRawTransaction(address, to, value)
+    console.log(rawTx)
+    const tx = await this.props.Coin.signTransaction(rawTx, addressIndex)
+    const hash = await sendTransaction(tx)
+    this.setState({txHash: hash})
+
   }
 
   render() {
     return (
       <Container style={{ textAlign: 'left' }}>
-        <h4 style={{ margin: 20 }}>Ethereum Tx</h4>
+        <h4 style={{ margin: 20 }}>Icon Tx</h4>
         <Container>
           {/* Get Address from Card */}
           <Row>
@@ -117,7 +82,7 @@ class CoinTest extends Component {
                       onChange={event => {
                         this.setState({ to: event.target.value })
                       }}
-                      placeholder='0x...'
+                      placeholder='hx...'
                     />
                   </Form.Group>
 
@@ -128,19 +93,7 @@ class CoinTest extends Component {
                       onChange={event => {
                         this.setState({ value: event.target.value })
                       }}
-                      placeholder='Amount in Eth'
-                    />
-                  </Form.Group>
-                </Form.Row>
-
-                <Form.Row>
-                  <Form.Group as={Col}>
-                    <Form.Label>Data</Form.Label>
-                    <Form.Control
-                      onChange={event => {
-                        this.setState({ data: event.target.value })
-                      }}
-                      placeholder='0x...'
+                      placeholder='Amount in ICX'
                     />
                   </Form.Group>
                 </Form.Row>
