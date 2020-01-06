@@ -5,8 +5,8 @@
   "dependencies": {
     "@coolwallets/errors": "0.0.4",
     "@coolwallets/transport-web-ble": "0.1.0",
-    "@coolwallets/wallet": "file:../coolwalletsjs/packages/cws-wallet",
-    "@coolwallets/xlm": "file:../coolwalletsjs/packages/cws-xlm",
+    "@coolwallets/wallet": "^0.0.13",
+    "@coolwallets/xlm": "^0.0.2",
     "axios": "^0.19.0",
     "bip39": "^3.0.2",
     "bootstrap": "^4.3.1",

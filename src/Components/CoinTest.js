@@ -35,10 +35,9 @@ class CoinTest extends Component {
   signTx = async () => {
     const { addressIndex, to, value, address } = this.state
     const sigbase = await getRawTransaction(address, to, value)
-    // console.log(rawTx)
-    const signature = await this.props.Coin.signTransaction(sigbase, addressIndex, 'SLIP0010')
-    const hash = await sendTransaction(address, signature)
-    console.log(hash)
+    const signature = await this.props.Coin.signTransaction(sigbase, addressIndex)
+    const message = await sendTransaction(address, signature)
+    this.setState({txHash: message})
 
   }
 

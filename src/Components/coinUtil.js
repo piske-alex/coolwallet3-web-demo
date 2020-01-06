@@ -48,10 +48,11 @@ export const sendTransaction = async(from, signature) => {
   console.log(tx)
   try {
     await server.submitTransaction(tx);
+    return 'success'
   } catch (error) {
     const msg = error.response ? JSON.stringify(error.response.data.extras.result_codes) : error;
     console.error(msg)
+    return msg
   }
-  // await server.submitTransaction(tx);
-  // return tx;
+ 
 }
