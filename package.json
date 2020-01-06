@@ -4,17 +4,18 @@
   "private": true,
   "dependencies": {
     "@coolwallets/errors": "0.0.4",
-    "@coolwallets/icx": "^0.0.2",
     "@coolwallets/transport-web-ble": "0.1.0",
     "@coolwallets/wallet": "file:../coolwalletsjs/packages/cws-wallet",
+    "@coolwallets/xlm": "file:../coolwalletsjs/packages/cws-xlm",
     "axios": "^0.19.0",
     "bip39": "^3.0.2",
     "bootstrap": "^4.3.1",
-    "icon-sdk-js": "0.0.18",
+    "js-stellar-sdk": "0.0.2",
     "react": "^16.11.0",
     "react-bootstrap": "^1.0.0-beta.14",
     "react-dom": "^16.11.0",
     "react-scripts": "3.2.0",
+    "stellar-sdk": "^3.3.0",
     "web3": "^1.2.2"
   },
   "scripts": {

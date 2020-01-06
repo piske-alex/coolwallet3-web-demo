@@ -11,7 +11,7 @@ import CoinTest from './Components/CoinTest'
 
 import CoolWallet from '@coolwallets/wallet'
 // import cwsETH from '@coolwallets/eth'
-import cwsICX from '@coolwallets/icx'
+import cwsXLM from '@coolwallets/xlm'
 import WebBleTransport from '@coolwallets/transport-web-ble';
 import { getAppKeysOrGenerate, getAppIdOrNull } from './Utils/sdkUtil'
 
@@ -49,10 +49,8 @@ export default class App extends React.Component {
 
   render() {
     const { transport } = this.state;
-    // const bridge = new CoolWalletSBridge()
     const wallet = new CoolWallet(transport, appPrivateKey, appId);
-    // const ETH = new cwsETH(transport, appPrivateKey, appId);
-    const ICX = new cwsICX(transport, appPrivateKey, appId)
+    const XLM = new cwsXLM(transport, appPrivateKey, appId)
     return (
       <div className='App'>
         <header className='App-header'>
@@ -75,7 +73,7 @@ export default class App extends React.Component {
             </Row>
             <Row style={{ margin: 20 }}>
               <Col>
-                <CoinTest Coin={ICX}></CoinTest>
+                <CoinTest Coin={XLM}></CoinTest>
               </Col>
             </Row>
           </Container>

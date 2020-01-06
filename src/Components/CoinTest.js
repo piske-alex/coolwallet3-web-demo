@@ -9,7 +9,7 @@ import FormControl from 'react-bootstrap/FormControl'
 import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Form'
 
-import { getIconBalance, getRawTransaction, sendTransaction } from './iconUtils'
+import { getBalance, getRawTransaction, sendTransaction } from './coinUtil'
 
 class CoinTest extends Component {
 
@@ -24,9 +24,9 @@ class CoinTest extends Component {
 
   getAddress = () => {
     const addressIdx = parseInt(this.state.addressIndex)
-    this.props.Coin.getAddress(addressIdx).then(address => {
+    this.props.Coin.getAccount(addressIdx).then(address => {
       this.setState({ address })
-      getIconBalance(address).then(balance => {
+      getBalance(address).then(balance => {
         this.setState({balance})
       })
     })
@@ -34,18 +34,18 @@ class CoinTest extends Component {
 
   signTx = async () => {
     const { addressIndex, to, value, address } = this.state
-    const rawTx = await getRawTransaction(address, to, value)
-    console.log(rawTx)
-    const tx = await this.props.Coin.signTransaction(rawTx, addressIndex)
-    const hash = await sendTransaction(tx)
-    this.setState({txHash: hash})
+    const sigbase = await getRawTransaction(address, to, value)
+    // console.log(rawTx)
+    const signature = await this.props.Coin.signTransaction(sigbase, addressIndex, 'SLIP0010')
+    const hash = await sendTransaction(address, signature)
+    console.log(hash)
 
   }
 
   render() {
     return (
       <Container style={{ textAlign: 'left' }}>
-        <h4 style={{ margin: 20 }}>Icon Tx</h4>
+        <h4 style={{ margin: 20 }}>Stellar Tx</h4>
         <Container>
           {/* Get Address from Card */}
           <Row>
