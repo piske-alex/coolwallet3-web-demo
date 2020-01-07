@@ -6,7 +6,7 @@
     "@coolwallets/errors": "0.0.4",
     "@coolwallets/transport-web-ble": "0.1.0",
     "@coolwallets/wallet": "^0.0.13",
-    "@coolwallets/xlm": "^0.0.2",
+    "@coolwallets/xrp": "file:../coolwalletsjs/packages/cws-xrp",
     "axios": "^0.19.0",
     "bip39": "^3.0.2",
     "bootstrap": "^4.3.1",
@@ -14,9 +14,7 @@
     "react": "^16.11.0",
     "react-bootstrap": "^1.0.0-beta.14",
     "react-dom": "^16.11.0",
-    "react-scripts": "3.2.0",
-    "stellar-sdk": "^3.3.0",
-    "web3": "^1.2.2"
+    "react-scripts": "3.2.0"
   },
   "scripts": {
     "start": "react-scripts start",

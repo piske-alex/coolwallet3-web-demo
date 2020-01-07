@@ -11,7 +11,7 @@ import CoinTest from './Components/CoinTest'
 
 import CoolWallet from '@coolwallets/wallet'
 // import cwsETH from '@coolwallets/eth'
-import cwsXLM from '@coolwallets/xlm'
+import cwsXRP from '@coolwallets/xrp'
 import WebBleTransport from '@coolwallets/transport-web-ble';
 import { getAppKeysOrGenerate, getAppIdOrNull } from './Utils/sdkUtil'
 
@@ -50,7 +50,7 @@ export default class App extends React.Component {
   render() {
     const { transport } = this.state;
     const wallet = new CoolWallet(transport, appPrivateKey, appId);
-    const XLM = new cwsXLM(transport, appPrivateKey, appId)
+    const XRP = new cwsXRP(transport, appPrivateKey, appId)
     return (
       <div className='App'>
         <header className='App-header'>
@@ -73,7 +73,7 @@ export default class App extends React.Component {
             </Row>
             <Row style={{ margin: 20 }}>
               <Col>
-                <CoinTest Coin={XLM}></CoinTest>
+                <CoinTest Coin={XRP}></CoinTest>
               </Col>
             </Row>
           </Container>
