@@ -9,27 +9,22 @@ import FormControl from 'react-bootstrap/FormControl';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 
-import { getRawTransaction, sendTransaction } from './coinUtil';
+import { getTxObject } from './coinUtil';
 
 class CoinTest extends Component {
   state = {
-
     publicKey: '',
     addressIndex: 0,
     address: '',
-    to: 'rp6ENYKqYfT5qJqQiN2Y9AnZmFEWv9hRpq',
-    destinationTag: 1882298635,
-    sequence: 1566719,
-    lastsequence: 47914574,
-    fee: '0',
-    amount: '0',
+    to: 'bnb1uzsh50kfmh73m8ytfcta7p3zceull2ycnttw5s',
+    amount: 100000,
 
-    txHash: '',
+    signature: '',
   };
 
   getPublicKey = async () => {
     const addressIdx = parseInt(this.state.addressIndex);
-    const publicKey = await this.props.Coin.getPublicKey(addressIdx)
+    const publicKey = await this.props.Coin.getPublicKey(addressIdx);
     this.setState({ publicKey });
   };
 
@@ -41,29 +36,65 @@ class CoinTest extends Component {
   };
 
   signTx = async () => {
-    const payment = {
-      TransactionType: 'Payment',
-      Flags: '2147483648',
-      Sequence: this.state.sequence,
-      DestinationTag: this.state.destinationTag,
-      LastLedgerSequence: this.state.lastsequence,
-      Amount: this.state.amount,
-      Fee: this.state.fee,
-      Account: this.state.address,
-      Destination: this.state.to
-    }
-    console.log(payment)
-  
-    const signedTx = await this.props.Coin.signPayment(payment, this.state.addressIndex);
-    console.log(signedTx)
-    // const message = await sendTransaction(address, signature);
-    // this.setState({ txHash: message });
+    const { address, to, amount, addressIndex } = this.state;
+    const tx = getTxObject(address, to, amount);
+    const signature = await this.props.Coin.signTransfer(tx, addressIndex);
+    this.setState({ signature });
+  };
+
+  signPlaceOrder = async () => {
+    const { address, addressIndex } = this.state;
+    const tx = {
+      account_number: '39',
+      chain_id: 'Binance-Chain-Tigris',
+      data: null,
+      memo: '',
+      msgs: [
+        {
+          id: 'D1A42A815FC6A339ECD8BFCD093DD1A835F40E13-505',
+          ordertype: 2,
+          price: 29333,
+          quantity: 1000000000,
+          sender: address,
+          side: 1,
+          symbol: 'PYN-C37_BNB',
+          timeinforce: 1,
+        },
+      ],
+      sequence: '504',
+      source: '1',
+    };
+    const signature = await this.props.Coin.placeOrder(tx, addressIndex);
+
+    this.setState({ signature });
+  };
+
+  signCancelOrder = async () => {
+    const { address, addressIndex } = this.state;
+    const tx = {
+      account_number: '39',
+      chain_id: 'Binance-Chain-Tigris',
+      data: null,
+      memo: '',
+      msgs: [
+        {
+          refid: 'D1A42A815FC6A339ECD8BFCD093DD1A835F40E13-506',
+          sender: address,
+          symbol: 'PYN-C37_BNB',
+        },
+      ],
+      sequence: '506',
+      source: '1',
+    };
+    const signature = await this.props.Coin.cancelOrder(tx, addressIndex);
+
+    this.setState({ signature });
   };
 
   render() {
     return (
       <Container style={{ textAlign: 'left' }}>
-        <h4 style={{ margin: 20 }}>Ripple Tx</h4>
+        <h4 style={{ margin: 20 }}> Binance Dex Tx</h4>
         <Container>
           {/* Get Address from Card */}
           <Row>
@@ -94,81 +125,52 @@ class CoinTest extends Component {
               <Form>
                 <Form.Row>
                   <Form.Group as={Col}>
-                    <Form.Label>Destination</Form.Label>
+                    <Form.Label> Transfer To </Form.Label>
                     <Form.Control
-                      value = {this.state.to}
+                      value={this.state.to}
                       onChange={(event) => {
                         this.setState({ to: event.target.value });
                       }}
-                      placeholder='rXp...'
+                      placeholder='bnb...'
                     />
                   </Form.Group>
                   <Form.Group as={Col}>
                     <Form.Label>Amount</Form.Label>
                     <Form.Control
                       type='value'
-                      value = {this.state.amount}
+                      value={this.state.amount}
                       onChange={(event) => {
                         this.setState({ amount: event.target.value });
                       }}
-                      placeholder='Amount in XRP'
-                    />
-                  </Form.Group>
-                  <Form.Group as={Col}>
-                    <Form.Label>Fee</Form.Label>
-                    <Form.Control
-                      type='value'
-                      value = {this.state.fee}
-                      onChange={(event) => {
-                        this.setState({ fee: event.target.value });
-                      }}
-                      placeholder='Amount in XRP'
+                      placeholder='Amount in BNB'
                     />
                   </Form.Group>
                 </Form.Row>
-                <Form.Row>
-                  <Form.Group as={Col}>
-                    <Form.Label>Sequence</Form.Label>
-                    <Form.Control 
-                    value = {this.state.sequence}
-                      onChange={(event) => {
-                        this.setState({ sequence: event.target.value });
-                      }}
-                      type='value'
-                    />
-                  </Form.Group>
-                  <Form.Group as={Col}>
-                    <Form.Label>DestinationTag</Form.Label>
-                    <Form.Control
-                    value = {this.state.destinationTag}
-                      onChange={(event) => {
-                        this.setState({ destinationTag: event.target.value });
-                      }}
-                      type='value'
-                    />
-                  </Form.Group>
-
-                  <Form.Group as={Col}>
-                    <Form.Label>LastLedgerSequence</Form.Label>
-                    <Form.Control
-                    value = {this.state.lastsequence}
-                      type='value'
-                      onChange={(event) => {
-                        this.setState({ lastsequence: event.target.value });
-                      }}
-                    />
-                  </Form.Group>
-                </Form.Row>
-
                 <Button variant='outline-success' onClick={this.signTx} disabled={this.isSigning}>
-                  Sign Payment
+                  Sign Transfer
+                </Button>
+                <br />
+                <br />
+                <Button
+                  variant='outline-success'
+                  onClick={this.signPlaceOrder}
+                  disabled={this.isSigning}
+                >
+                  Demo Place Order
+                </Button>
+                <Button
+                  variant='outline-success'
+                  onClick={this.signCancelOrder}
+                  disabled={this.isSigning}
+                >
+                  Demo Cancel Order
                 </Button>
               </Form>
             </Col>
           </Row>
           <Row style={{ paddingTop: 20 }}>
             <Col ms={12}>
-              <p style={{ textAlign: 'left', fontSize: 20 }}> Result: {this.state.txHash} </p>
+              <p style={{ textAlign: 'left', fontSize: 20 }}> Signature: {this.state.signature} </p>
             </Col>
           </Row>
         </Container>
