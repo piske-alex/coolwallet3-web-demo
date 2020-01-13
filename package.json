@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@coolwallets/eth": "0.1.11",
-    "@coolwallets/transport-web-ble": "0.1.0",
+    "@coolwallets/eth": "^0.1.12",
+    "@coolwallets/transport-web-ble": "^0.1.0",
     "@coolwallets/errors": "0.0.4",
-    "@coolwallets/wallet": "0.0.12",
+    "@coolwallets/wallet": "^0.0.14",
     "axios": "^0.19.0",
     "bip39": "^3.0.2",
     "bootstrap": "^4.3.1",
