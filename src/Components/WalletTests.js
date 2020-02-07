@@ -11,7 +11,7 @@ const bip39 = require('bip39')
 
 class WalletTest extends Component {
   state = {
-    mnemonic: '',
+    mnemonic: 'cliff govern lawn idea float share way left success acquire wing face',
     sumOfSeed: 0,
   }
   setMnemonic = () => {

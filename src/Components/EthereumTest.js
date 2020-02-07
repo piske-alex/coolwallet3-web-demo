@@ -10,8 +10,8 @@ import Form from 'react-bootstrap/Form'
 import Web3 from 'web3'
 import GasMenu from './GasMenu'
 
-const chainId = 3
-const web3 = new Web3('https://ropsten.infura.io/v3/44fd23cda65746a699a5d3c0e2fa45d5')
+const chainId = 1
+const web3 = new Web3('https://mainnet.infura.io/v3/44fd23cda65746a699a5d3c0e2fa45d5')
 
 class EthTest extends Component {
   constructor(props) {
@@ -70,9 +70,10 @@ class EthTest extends Component {
         }
         console.log(param)
         this.props.ETH.signTransaction(param, addressIndex).then(signedTx => {
+          console.log(signedTx)
           web3.eth.sendSignedTransaction(signedTx, (err, txHash) => {
             if (err) { console.error(err) }
-            this.setState({ txHash })
+            else this.setState({ txHash })
           })
         })
       })
