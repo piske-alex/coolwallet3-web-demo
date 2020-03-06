@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import Button from 'react-bootstrap/Button'
+import Row from 'react-bootstrap/Row'
 import axios from 'axios'
 
 class GasMenu extends Component {
@@ -23,6 +24,7 @@ class GasMenu extends Component {
 
   render() {
     return (
+      <Row style={{marginLeft: 5}}>
       <ButtonGroup>
         <Button
           active = {this.state.selected === 1}
@@ -55,6 +57,7 @@ class GasMenu extends Component {
           Slow: {this.state.slow}
         </Button>
       </ButtonGroup>
+      </Row>
     )
   }
 }
