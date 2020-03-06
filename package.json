@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@coolwallets/errors": "0.0.7",
     "@coolwallets/eth": "file:../coolwalletsjs/packages/cws-eth",
     "@coolwallets/transport-web-ble": "^0.1.0",
-    "@coolwallets/errors": "0.0.4",
     "@coolwallets/wallet": "file:../coolwalletsjs/packages/cws-wallet",
     "axios": "^0.19.0",
     "bip39": "^3.0.2",
@@ -13,6 +13,7 @@
     "react": "^16.11.0",
     "react-bootstrap": "^1.0.0-beta.14",
     "react-dom": "^16.11.0",
+    "react-router-dom": "^5.1.2",
     "react-scripts": "3.2.0",
     "web3": "^1.2.2"
   },
