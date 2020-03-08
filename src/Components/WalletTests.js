@@ -1,99 +1,97 @@
-import React, { Component } from 'react'
-import InputGroup from 'react-bootstrap/InputGroup'
-import FormControl from 'react-bootstrap/FormControl'
-import Button from 'react-bootstrap/Button'
-import Row from 'react-bootstrap/Row'
-// import View from 'react-bootstrap/View'
+import React, { useState } from 'react';
+import { InputGroup, FormControl, Button, Row, Container } from 'react-bootstrap';
+import CoolWallet from '@coolwallets/wallet';
 
-import Container from 'react-bootstrap/Container'
+import Settings from './Settings';
 
-const bip39 = require('bip39')
+const bip39 = require('bip39');
 
-class WalletTest extends Component {
-  state = {
-    mnemonic: 'cliff govern lawn idea float share way left success acquire wing face',
-    sumOfSeed: 0,
-  }
-  setMnemonic = () => {
-    const mnemonic = this.state.mnemonic
-    const hex = bip39.mnemonicToSeedSync(mnemonic).toString('hex')
-    console.log(`setting seed ${hex}`)
-    this.props.wallet
+function Wallet({ appPrivateKey, appPublicKey, appId, transport }) {
+  const wallet = new CoolWallet(transport, appPrivateKey, appId);
+
+  const [mnemonic, setMnemonic] = useState(
+    ''
+  );
+  const [sumOfSeed, setSumOfSeed] = useState(0);
+
+  const setSeed = () => {
+    console.log(`setting seed ${mnemonic}`);
+    const hex = bip39.mnemonicToSeedSync(mnemonic).toString('hex'); // '' 
+    wallet
       .setSeed(hex)
       .then(() => {
-        console.log(`Set seed success!`)
+        console.log(`Set seed success!`);
       })
-      .catch(error => {
-        console.log(error)
-      })
-  }
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
-  createWallet = () => {
-    this.props.wallet.createWallet(12).catch(error => {
-      console.error(error)
-    })
-  }
+  const createWallet = () => {
+    wallet.createWallet(12).catch((error) => {
+      console.error(error);
+    });
+  };
 
-  sendCheckSum = () => {
-    const sum = parseInt(this.state.sumOfSeed)
-    console.log(`sum ${sum}, type ${typeof sum}`)
-    this.props.wallet
+  const sendCheckSum = () => {
+    const sum = parseInt(sumOfSeed);
+    console.log(`sum ${sum}, type ${typeof sum}`);
+    wallet
       .sendCheckSum(sum)
-      .then(result => {
-        console.log(`send checksum success`)
+      .then((result) => {
+        console.log(`send checksum success`);
       })
-      .catch(error => {
-        console.error(error)
-      })
-  }
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
-  onchange = event => {
-    const mnemonic = event.target.value
-    this.setState({ mnemonic })
-  }
-
-  render() {
-    return (
-      <Container>
-        <h4> About Wallet </h4>
-        <Row>
-          <InputGroup className='mb-3' style={{ margin: 20 }}>
-            <FormControl
-              onChange={this.onchange}
-              value={this.state.mnemonic}
-              placeholder='Mnemonic'
-              aria-describedby='basic-addon2'
-            />
-            <InputGroup.Append>
-              <Button variant='outline-light' mode='contained' compact='true' onClick={this.setMnemonic}>
-                Set Seed
-              </Button>
-            </InputGroup.Append>
-          </InputGroup>
-        </Row>
-        <Row>
-          <InputGroup className='mb-3' style={{ margin: 20 }}>
-            <Button variant='outline-light' mode='contained' compact='true' onClick={this.createWallet}>
-              Create Wallet By Card
+  return (
+    <Container>
+      <h4> Create Wallet </h4>
+      <Row>
+        <InputGroup className='mb-3' style={{ margin: 5 }}>
+          <FormControl
+            onChange={(event) => {
+              setMnemonic(event.target.value);
+            }}
+            value={mnemonic}
+            placeholder='Mnemonic'
+            aria-describedby='basic-addon2'
+          />
+          <InputGroup.Append>
+            <Button variant='outline-light' mode='contained' compact='true' onClick={setSeed}>
+              Set Seed
             </Button>
-            <FormControl
-              onChange={event => {
-                this.setState({ sumOfSeed: event.target.value })
-              }}
-              value={this.state.sumOfSeed}
-              placeholder='Sum Of Seed'
-              aria-describedby='basic-addon2'
-            />
-            <InputGroup.Append>
-              <Button variant='outline-light' mode='contained' compact='true' onClick={this.sendCheckSum}>
-                Check Sum
-              </Button>
-            </InputGroup.Append>
-          </InputGroup>
-        </Row>
-      </Container>
-    )
-  }
+          </InputGroup.Append>
+        </InputGroup>
+      </Row>
+      <Row>
+        <InputGroup className='mb-3' style={{ margin: 5 }}>
+          <Button variant='outline-light' mode='contained' compact='true' onClick={createWallet}>
+            Create Wallet By Card
+          </Button>
+          <FormControl
+            onChange={(event) => {
+              setSumOfSeed(event.target.value);
+            }}
+            value={sumOfSeed}
+            placeholder='Sum Of Seed'
+            aria-describedby='basic-addon2'
+          />
+          <InputGroup.Append>
+            <Button variant='outline-light' mode='contained' compact='true' onClick={sendCheckSum}>
+              Check Sum
+            </Button>
+          </InputGroup.Append>
+        </InputGroup>
+      </Row>
+      {/* Settings  */}
+      <Row>
+        <Settings wallet={wallet} appPublicKey={appPublicKey} />
+      </Row>
+    </Container>
+  );
 }
 
-export default WalletTest
+export default Wallet;

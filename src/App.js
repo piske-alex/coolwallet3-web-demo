@@ -1,84 +1,61 @@
-import React from 'react'
-import './App.css'
-import Container from 'react-bootstrap/Container'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
+import React, { useState } from 'react';
+import { HashRouter as Router } from 'react-router-dom';
+import './App.css';
+import Container from 'react-bootstrap/Container';
+import { Row, Col } from 'react-bootstrap';
 
-import Connection from './Components/Connection'
-import Settings from './Components/Settings'
-import WalletTest from './Components/WalletTests'
-import ETHTest from './Components/EthereumTest'
+import MyNavBar from './Components/NavBar';
+import Connection from './Components/Connection';
 
-import CoolWallet from '@coolwallets/wallet'
-import cwsETH from '@coolwallets/eth'
+import Routes from './Components/Routes'
+
+
 import WebBleTransport from '@coolwallets/transport-web-ble';
-import { getAppKeysOrGenerate, getAppIdOrNull } from './Utils/sdkUtil'
+import { getAppKeysOrGenerate, getAppIdOrNull } from './Utils/sdkUtil';
 
-const { appPublicKey, appPrivateKey } = getAppKeysOrGenerate()
-const appId = getAppIdOrNull()
+const { appPublicKey, appPrivateKey } = getAppKeysOrGenerate();
+const appId = getAppIdOrNull();
 
-export default class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      transport: {}
-    }
-  }
+function App() {
+  const [transport, setTransport] = useState({});
 
-  connect = async () => {
+  const connect = async () => {
     WebBleTransport.listen(async (error, device) => {
       if (device) {
         const transport = await WebBleTransport.connect(device);
-        this.setState({
-          transport
-        });
-        return transport;
-      }
-      throw error;
+        setTransport(transport);
+      } else throw error;
     });
-  }
+  };
 
-  disconnect = () => {
-    const { transport } = this.state;
+  const disconnect = () => {
     WebBleTransport.disconnect(transport.device.id);
-    this.setState({
-      transport: {}
-    });
-  }
+    setTransport({});
+  };
 
-  render() {
-    const { transport } = this.state;
-    // const bridge = new CoolWalletSBridge()
-    const wallet = new CoolWallet(transport, appPrivateKey, appId);
-    const ETH = new cwsETH(transport, appPrivateKey, appId);
-    return (
-      <div className='App'>
-        <header className='App-header'>
-          <Container>
-            <h3 style={{ padding: 20 }}> CoolWalletS x Web BLE </h3>
-          </Container>
-          <Container>
-            <Row style={{ margin: 20 }}>
-              <Col>
-                <Connection connect={this.connect} disconnect={this.disconnect}></Connection>
-              </Col>
-              <Col>
-                <Settings wallet={wallet} appPublicKey={appPublicKey}></Settings>
-              </Col>
-            </Row>
-            <Row style={{ margin: 20 }}>
-              <Col>
-                <WalletTest wallet={wallet}></WalletTest>
-              </Col>
-            </Row>
-            <Row style={{ margin: 20 }}>
-              <Col>
-                <ETHTest ETH={ETH}></ETHTest>
-              </Col>
-            </Row>
-          </Container>
-        </header>
-      </div>
-    )
-  }
+  return (
+    <div className='App'>
+      <Router>
+        <MyNavBar />
+        <Container className='App-header'>
+          <Row style={{ margin: 5 }}>
+            <Col>
+              <h4 style={{ padding: 5 }}> CoolWalletS SDK Test </h4>
+            </Col>
+            <Col>
+              <Connection connect={connect} disconnect={disconnect}></Connection>
+            </Col>
+          </Row>
+        </Container>
+        <Routes
+          transport={transport}
+          appId={appId}
+          appPrivateKey={appPrivateKey}
+          appPublicKey={appPublicKey}
+        />
+      </Router>
+    </div>
+  );
 }
+
+export default App;
