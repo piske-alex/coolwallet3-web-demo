@@ -32,7 +32,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 
   return (
     <Container style={{ textAlign: 'left' }}>
-      <h4> Get Address</h4>
+      <h5> Get Address</h5>
       {/* Get Address from Card */}
       <Row>
         <Col xs={3}>

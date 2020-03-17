@@ -37,10 +37,10 @@ function App() {
     <div className='App'>
       <Router>
         <MyNavBar />
-        <Container className='App-header'>
-          <Row style={{ margin: 5 }}>
+        <Container>
+          <Row style={{ margin: '5%' }}>
             <Col>
-              <h4 style={{ padding: 5 }}> CoolWalletS SDK Test </h4>
+              <h2 style={{ padding: 5 }}> SDK Test </h2>
             </Col>
             <Col>
               <Connection connect={connect} disconnect={disconnect}></Connection>

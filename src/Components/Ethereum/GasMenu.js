@@ -24,8 +24,8 @@ class GasMenu extends Component {
 
   render() {
     return (
-      <Row style={{marginLeft: 5}}>
-      <ButtonGroup>
+      // <Row style={{marginLeft: 5}}>
+      <ButtonGroup block >
         <Button
           active = {this.state.selected === 1}
           variant='secondary'
@@ -57,7 +57,7 @@ class GasMenu extends Component {
           Slow: {this.state.slow}
         </Button>
       </ButtonGroup>
-      </Row>
+      // </Row>
     )
   }
 }

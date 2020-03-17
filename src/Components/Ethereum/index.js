@@ -54,6 +54,7 @@ function EthTest({ transport, appPrivateKey, appId }) {
         if (err) {
           console.error(`estimate gas failed`, err);
         }
+        if (!gasLimit) gasLimit = 21000;
         const gasLimitHex = web3.utils.toHex(gasLimit);
         const gasPriceHex = web3.utils.toHex(web3.utils.toWei(gasPrice.toString(), 'Gwei'));
         const param = {
@@ -84,7 +85,7 @@ function EthTest({ transport, appPrivateKey, appId }) {
 
   return (
     <Container style={{ textAlign: 'left' }}>
-      <h4> Get Address</h4>
+      <h5> Get Address</h5>
       {/* Get Address from Card */}
       <Row>
         <Col xs={3}>
@@ -111,12 +112,12 @@ function EthTest({ transport, appPrivateKey, appId }) {
       </Row>
       <br></br>
       {/* Sign Test Transfer */}
-      <h4>Sign Transaction</h4>
+      <h5>Sign Transaction</h5>
       <Row>
         <Col>
           <Form>
             <Form.Row>
-              <Form.Group as={Col} controlId='formGridTo'>
+              <Form.Group xs={4} as={Col} controlId='formGridTo'>
                 <Form.Label>To</Form.Label>
                 <Form.Control
                   value={to}
@@ -138,14 +139,14 @@ function EthTest({ transport, appPrivateKey, appId }) {
                   placeholder='Amount in Eth'
                 />
               </Form.Group>
-              <Form.Group as={Col}>
+              <Form.Group xs={4} as={Col}>
                 <Form.Label> Gas (Gwei) </Form.Label>
                 <GasMenu handler={gasHandler}></GasMenu>
               </Form.Group>
             </Form.Row>
 
             <Form.Row>
-              <Form.Group as={Col}>
+              <Form.Group as={Col} xs={10}>
                 <Form.Label>Data</Form.Label>
                 <Form.Control
                   value={data}
@@ -156,17 +157,19 @@ function EthTest({ transport, appPrivateKey, appId }) {
                   placeholder='0x...'
                 />
               </Form.Group>
+              <Form.Group as={Col} xs={2}>
+                <Form.Label> Send </Form.Label>
+                <Button variant='outline-success' onClick={signTx}>
+                  Sign & Send
+                </Button>
+              </Form.Group>
             </Form.Row>
-
-            <Button variant='outline-success' onClick={signTx}>
-              Sign & Send
-            </Button>
           </Form>
         </Col>
       </Row>
       <Row style={{ paddingTop: 20 }}>
         <Col ms={12}>
-          <p style={{ textAlign: 'left', fontSize: 20 }}> Result: {txHash} </p>
+          <p style={{ textAlign: 'left', fontSize: 20 }}> {txHash} </p>
         </Col>
       </Row>
       <Row>

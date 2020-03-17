@@ -14,6 +14,7 @@ function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
             transport={transport}
             appPrivateKey={appPrivateKey}
             appPublicKey={appPublicKey}
+            appId={appId}
           />
         }
         appId={appId}
@@ -22,10 +23,6 @@ function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
         path='/eth'
         children={<ETHTest transport={transport} appPrivateKey={appPrivateKey} appId={appId} />}
       />
-      {/* <Route
-        path='/btc'
-        children={<BitcoinTest transport={transport} appPrivateKey={appPrivateKey} appId={appId} />}
-      /> */}
       <Route path='/' children={<></>} />
     </Switch>
   );

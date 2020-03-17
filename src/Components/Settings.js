@@ -1,60 +1,111 @@
-import React, { Component } from 'react';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Button from 'react-bootstrap/Button';
+import React, { useState } from 'react';
+import { Container, InputGroup, FormControl, Row, Col, Button } from 'react-bootstrap';
 import { AlreadyRegistered } from '@coolwallets/errors';
 
-class SettingPage extends Component {
-  getPassword = () => {
-    this.props.wallet.getPairingPassword().then((pwd) => {
-      console.log(`Got pairing password: ${pwd}`);
-    });
+function SettingPage({ wallet, appPublicKey }) {
+  const [password, setPassword] = useState('12345678');
+  const [newPassword, setNewPassword] = useState('')
+
+  const [isRevokingPassword, setIsRevokingPassword] = useState(false)
+  const [isResetting, setIsResetting] = useState(false)
+  const [isRegistering, setIsRegistering] = useState(false)
+
+  const getPassword = async () => {
+    setIsRevokingPassword(true)
+    try {
+      const newPassword = await wallet.getPairingPassword(); //.then((pwd) => {
+      setNewPassword(newPassword)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsRevokingPassword(false)
+    }
   };
 
-  registerWithCard = () => {
-    console.log(this.props)
-    this.props.wallet
-      .register(this.props.appPublicKey, '12345678', 'myChromeExt')
-      .then((appId) => {
-        localStorage.setItem('appId', appId);
-        this.props.wallet.setAppId(appId);
-        console.log(`Store AppId complete! ${appId}`);
-      })
-      .catch((error) => {
-        if (error instanceof AlreadyRegistered) {
-          console.log(`Already registered`);
-        } else {
-          console.error(error);
-        }
-      });
+  const registerWithCard = async (password) => {
+    try {
+      setIsRegistering(true)
+      const appId = await wallet.register(appPublicKey, password, 'TestAPP');
+      localStorage.setItem('appId', appId);
+      wallet.setAppId(appId);
+    } catch (error) {
+      if (error instanceof AlreadyRegistered) {
+        console.log(`Already registered`);
+      } else {
+        console.error(error);
+      }
+    } finally {
+      setIsRegistering(false)
+    }
   };
 
-  render() {
-    return (
-      <Container>
-        <h4>Settings</h4>
-        <Row>
+  const resetCard = async () => {
+    setIsResetting(true)
+    try {
+      await wallet.resetCard();
+    } catch(error) {
+      console.error(error)
+    } finally {
+      setIsResetting(false)
+    }
+    
+  }
+
+  return (
+    <Container>
+      <h4>Settings</h4>
+      <Row>
+        <Col xs={3}>
           <Button
+            block
+            disabled={isResetting}
             variant='outline-danger'
             style={{ margin: 5 }}
-            onClick={() => {
-              this.props.wallet.resetCard();
-            }}
+            onClick={resetCard}
           >
-            Reset
+            { isResetting ? 'Loading...' : 'Reset Card'}
           </Button>
-          <Button style={{ margin: 5 }} variant='outline-light' onClick={this.registerWithCard}>
-            Register
-          </Button>
+        </Col>
+        <Col xs={4}>
+          <InputGroup className='mb-3' style={{ margin: 5 }}>
+            <FormControl
+              onChange={(event) => {
+                setPassword(event.target.value);
+              }}
+              value={password}
+              placeholder='pairing password'
+            />
+            <InputGroup.Append>
+              <Button
+                disabled={isRegistering}
+                variant='outline-light'
+                mode='contained'
+                compact='true'
+                onClick={() => {
+                  registerWithCard(password);
+                }}
+              >
+                { isRegistering? 'Loading...' : 'Register'}
+              </Button>
+            </InputGroup.Append>
+          </InputGroup>
+        </Col>
 
-          <Button variant='outline-light' style={{ margin: 5 }} onClick={this.getPassword}>
-            {' '}
-            Get password
+        <Col cs={3}>
+          <Button 
+            disabled={isRevokingPassword}
+            variant='outline-light' 
+            style={{ margin: 5 }} 
+            onClick={getPassword}>
+            { isRevokingPassword ? 'Loading' :'Get password'}
           </Button>
-        </Row>
-      </Container>
-    );
-  }
+        </Col>
+        <Col cs={3}>
+          {newPassword}
+        </Col>
+      </Row>
+    </Container>
+  );
 }
 
 export default SettingPage;
