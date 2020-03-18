@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
 import { InputGroup, FormControl, Button, Row, Container, Col } from 'react-bootstrap';
-import CoolWallet from '@coolwallets/wallet';
-
-import Settings from './Settings';
-
 const bip39 = require('bip39');
 
-function Wallet({ appPrivateKey, appPublicKey, appId, transport }) {
-  const wallet = new CoolWallet(transport, appPrivateKey, appId);
+function Wallet({ wallet }) {
 
   const [isSettingSeed, setIsSettingSeed] = useState(false);
   const [isCheckingSum, setIsCheckingSum] = useState(false);
@@ -105,10 +100,6 @@ function Wallet({ appPrivateKey, appPublicKey, appId, transport }) {
             </InputGroup.Append>
           </InputGroup>
         </Col>
-      </Row>
-      {/* Settings  */}
-      <Row>
-        <Settings wallet={wallet} appPublicKey={appPublicKey} />
       </Row>
     </Container>
   );

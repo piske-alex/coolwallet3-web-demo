@@ -63,7 +63,7 @@ function SettingPage({ wallet, appPublicKey }) {
             style={{ margin: 5 }}
             onClick={resetCard}
           >
-            { isResetting ? 'Loading...' : 'Reset Card'}
+            { isResetting ? 'Please Press Button...' : 'Reset Card'}
           </Button>
         </Col>
         <Col xs={4}>
@@ -85,7 +85,7 @@ function SettingPage({ wallet, appPublicKey }) {
                   registerWithCard(password);
                 }}
               >
-                { isRegistering? 'Loading...' : 'Register'}
+                { isRegistering? 'Please Press Button...' : 'Register'}
               </Button>
             </InputGroup.Append>
           </InputGroup>

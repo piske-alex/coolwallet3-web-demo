@@ -121,7 +121,7 @@ function EthTest({ transport, appPrivateKey, appId }) {
 
   return (
     <Container style={{ textAlign: 'left' }}>
-      <h5> Get Address</h5>
+      <h4> Get Address</h4>
       <Row>
         <Col xs={3}>
           <InputGroup className='mb-3'>
@@ -152,13 +152,13 @@ function EthTest({ transport, appPrivateKey, appId }) {
       </Row>
       <br></br>
       {/* Sign Test Transfer */}
-      <h5>Sign Transaction</h5>
+      <h4>Sign Transaction</h4>
       <Row>
         <Col>
           <Form>
             <Form.Row>
               <Form.Group xs={4} as={Col} controlId='formGridTo'>
-                <Form.Label>To</Form.Label>
+                <Form.Label style={{fontSize: 20}}>To</Form.Label>
                 <Form.Control
                   value={to}
                   onChange={(event) => {
@@ -169,7 +169,7 @@ function EthTest({ transport, appPrivateKey, appId }) {
               </Form.Group>
 
               <Form.Group xs={4} md={2} as={Col} controlId='Amount'>
-                <Form.Label>Amount</Form.Label>
+                <Form.Label style={{fontSize: 20}}>Amount</Form.Label>
                 <Form.Control
                   type='value'
                   value={value}
@@ -180,14 +180,14 @@ function EthTest({ transport, appPrivateKey, appId }) {
                 />
               </Form.Group>
               <Form.Group xs={4} as={Col}>
-                <Form.Label> Gas (Gwei) </Form.Label>
+                <Form.Label style={{fontSize: 20}}> Gas (Gwei) </Form.Label>
                 <GasMenu handler={gasHandler}></GasMenu>
               </Form.Group>
             </Form.Row>
 
             <Form.Row>
               <Form.Group as={Col} xs={10}>
-                <Form.Label>Data</Form.Label>
+                <Form.Label style={{fontSize: 20}}>Data</Form.Label>
                 <Form.Control
                   value={data}
                   onChange={(event) => {
@@ -198,7 +198,7 @@ function EthTest({ transport, appPrivateKey, appId }) {
                 />
               </Form.Group>
               <Form.Group as={Col} xs={2}>
-                <Form.Label> Send </Form.Label>
+                <Form.Label style={{fontSize: 20}}> Send </Form.Label>
                 <Button disabled={isSigningTransaction} variant='outline-success' onClick={signTx}>
                   {isSigningTransaction ? 'Signing Tx...' : 'Sign & Send'}
                 </Button>
@@ -212,7 +212,7 @@ function EthTest({ transport, appPrivateKey, appId }) {
           <p style={{ textAlign: 'left', fontSize: 20 }}> {txHash} </p>
         </Col>
       </Row>
-      <h5>Sign Message</h5>
+      <h4>Sign Message</h4>
       <Row>
         <Col xs={4}>
           <FormControl

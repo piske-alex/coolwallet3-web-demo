@@ -1,6 +1,6 @@
 import React from 'react';
 import { HashRouter as Switch, Route } from 'react-router-dom';
-import WalletTest from './WalletTests';
+import ManageWallet from './WalletManagement';
 import ETHTest from './Ethereum';
 // import BitcoinTest from './Bitcoin/index'
 
@@ -10,7 +10,7 @@ function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
       <Route
         path='/wallet/'
         children={
-          <WalletTest
+          <ManageWallet
             transport={transport}
             appPrivateKey={appPrivateKey}
             appPublicKey={appPublicKey}
