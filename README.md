@@ -1,18 +1,18 @@
 # CoolWalletS WebApp Demo
 
-![](https://i.imgur.com/fw0M8C5.png)
+![screenshot](https://i.imgur.com/fw0M8C5.png)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 This is a demo of how to use CoolWalletS SDK to built your own Dapp.
 
-### Install and run
+## Install and run
 
-```
+```shell
 npm insatll
 ```
 
-```
+```shell
 yarn start
 # or
 npm start
