@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import Button from 'react-bootstrap/Button'
-import Row from 'react-bootstrap/Row'
 import axios from 'axios'
 
 class GasMenu extends Component {

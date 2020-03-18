@@ -26,15 +26,6 @@ function MyNavBar() {
           ETH
         </Nav.Link>
       </Nav.Item>
-      <Nav.Item>
-        <Nav.Link
-          onClick={() => {
-            history.push('btc');
-          }}
-        >
-          BTC
-        </Nav.Link>
-      </Nav.Item>
     </Nav>
   );
 }
