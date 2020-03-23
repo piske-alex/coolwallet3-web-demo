@@ -108,8 +108,7 @@ function EthTest({ transport, appPrivateKey, appId }) {
   const signMessage = async (message) => {
     setIsSigningMsg(true);
     try {
-      const addrIndex = 0;
-      const signature = await ETH.signMessage(message, addrIndex);
+      const signature = await ETH.signMessage(message, addressIndex);
       console.log(`Full Message Signature: ${signature}`)
       setMessageSignature(signature);
     } catch (error) {
