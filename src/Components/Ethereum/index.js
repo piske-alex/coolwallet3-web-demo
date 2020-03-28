@@ -14,7 +14,7 @@ import GasMenu from './GasMenu';
 import cwsETH from '@coolwallets/eth';
 
 const chainId = 1;
-const web3 = new Web3('https://mainnet.infura.io/v3/44fd23cda65746a699a5d3c0e2fa45d5');
+const web3 = new Web3('https://mainnet.infura.io/v3/dd7e77cc740a4a32ab3c94d9a08b90ae');
 
 function EthTest({ transport, appPrivateKey, appId }) {
   const ETH = new cwsETH(transport, appPrivateKey, appId);
