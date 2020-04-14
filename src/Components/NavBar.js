@@ -1,32 +1,36 @@
 import React from 'react';
 
-import Nav from 'react-bootstrap/Nav';
+import { Navbar, Nav } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 
-function MyNavBar() {
+function MyNavBar(props) {
   const history = useHistory();
 
   return (
-    <Nav>
-      <Nav.Item>
-        <Nav.Link
-          onClick={() => {
-            history.push('wallet');
-          }}
-        >
-          Wallet
-        </Nav.Link>
-      </Nav.Item>
-      <Nav.Item>
-        <Nav.Link
-          onClick={() => {
-            history.push('eth');
-          }}
-        >
-          ETH
-        </Nav.Link>
-      </Nav.Item>
-    </Nav>
+		<Navbar bg='light' expand='lg'>
+			<Navbar.Brand href="#home">Navbar</Navbar.Brand>
+			<Nav variant='tabs'>
+			  <Nav.Item>
+			    <Nav.Link
+			      onClick={() => {
+			        history.push('wallet');
+			      }}
+			    >
+			      Wallet
+						{props.cardName}
+			    </Nav.Link>
+			  </Nav.Item>
+			  <Nav.Item>
+			    <Nav.Link
+			      onClick={() => {
+			        history.push('eth');
+			      }}
+			    >
+			      ETH
+			    </Nav.Link>
+			  </Nav.Item>
+			</Nav>
+		</Navbar>
   );
 }
 
