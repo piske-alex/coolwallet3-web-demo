@@ -1,32 +1,29 @@
-import React from 'react';
-
+import React, { useState } from 'react';
 import { Navbar, Nav } from 'react-bootstrap';
-import { useHistory } from 'react-router-dom';
+import './NavBar.css';
 
-function MyNavBar(props) {
-  const history = useHistory();
+function MyNavBar() {
+  const [activeTab, setActiveTab] = useState('#wallet');
 
   return (
-		<Navbar bg='light' expand='lg'>
-			<Navbar.Brand href="#home">Navbar</Navbar.Brand>
-			<Nav variant='tabs'>
+		<Navbar variant='dark' expand='lg'>
+			<Nav variant='tabs' activeKey={activeTab} onSelect={(key)=>{
+				console.log('key :', key);
+				setActiveTab(key);
+			}}>
 			  <Nav.Item>
-			    <Nav.Link
-			      onClick={() => {
-			        history.push('wallet');
-			      }}
-			    >
+					<Nav.Link className='NavItem' href='#wallet'>
 			      Wallet
-						{props.cardName}
 			    </Nav.Link>
 			  </Nav.Item>
 			  <Nav.Item>
-			    <Nav.Link
-			      onClick={() => {
-			        history.push('eth');
-			      }}
-			    >
+			    <Nav.Link className='NavItem' href='#eth'>
 			      ETH
+			    </Nav.Link>
+			  </Nav.Item>
+			  <Nav.Item>
+			    <Nav.Link className='NavItem' href='#btc'>
+			      BTC
 			    </Nav.Link>
 			  </Nav.Item>
 			</Nav>

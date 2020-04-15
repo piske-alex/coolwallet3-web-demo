@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { HashRouter as Router } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import WebBleTransport from '@coolwallets/transport-web-ble';
@@ -6,7 +6,6 @@ import WebBleTransport from '@coolwallets/transport-web-ble';
 import { getAppKeysOrGenerate, getAppIdOrNull } from './Utils/sdkUtil';
 import Routes from './Components/Routes'
 import MyNavBar from './Components/NavBar';
-import Connection from './Components/Connection';
 import './App.css';
 
 const { appPublicKey, appPrivateKey } = getAppKeysOrGenerate();
@@ -44,7 +43,7 @@ function App() {
 						<Col>
 							<MyNavBar/>
 						</Col>
-						{cardName}
+						<p style={{ paddingTop: 15, paddingRight: 10 }}>{cardName}</p>
 						{connectButton()}
 					</Row>
           <Row style={{ margin: '5%' }}>

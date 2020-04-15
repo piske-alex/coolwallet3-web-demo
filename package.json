@@ -1,6 +1,6 @@
 {
-  "name": "web-ble-test",
-  "version": "0.2.0",
+  "name": "coolwallet-web-demo",
+  "version": "0.3.0",
   "private": true,
   "dependencies": {
     "@coolwallets/errors": "0.0.7",
