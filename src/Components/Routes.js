@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter as Switch, Route } from 'react-router-dom';
+import { HashRouter as Switch, Route, Redirect } from 'react-router-dom';
 import ManageWallet from './WalletManagement';
 import ETHTest from './Ethereum';
 // import BitcoinTest from './Bitcoin/index'
@@ -7,6 +7,7 @@ import ETHTest from './Ethereum';
 function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
   return (
     <Switch>
+			<Redirect from='/' to='/wallet'/>
       <Route
         path='/wallet/'
         children={
