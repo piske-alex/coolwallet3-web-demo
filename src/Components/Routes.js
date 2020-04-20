@@ -2,7 +2,7 @@ import React from 'react';
 import { HashRouter as Switch, Route, Redirect } from 'react-router-dom';
 import ManageWallet from './WalletManagement';
 import ETHTest from './Ethereum';
-// import BitcoinTest from './Bitcoin/index'
+import BitcoinTest from './Bitcoin'
 
 function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
   return (
@@ -24,7 +24,10 @@ function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
         path='/eth'
         children={<ETHTest transport={transport} appPrivateKey={appPrivateKey} appId={appId} />}
       />
-      <Route path='/' children={<></>} />
+      <Route
+        path='/btc'
+        children={<BitcoinTest transport={transport} appPrivateKey={appPrivateKey} appId={appId} />}
+      />
     </Switch>
   );
 }
