@@ -16,12 +16,10 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 
   const [addressIndex, setAddressIndex] = useState(0);
   const [balance, setBalance] = useState(0);
-
   const [address, setAddress] = useState('');
 
   const getAddress = () => {
-    const addressIdx = parseInt(addressIndex);
-    BTC.getSegwitAddress(addressIdx).then((address) => {
+    BTC.getAddress(BTC.ScriptType.P2SH_P2WPKH, addressIndex).then((address) => {
       setAddress(address);
       getBTCBalance(address).then((balance) => {
         console.log(`Update BTC balance ${balance}`);

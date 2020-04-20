@@ -22,23 +22,23 @@ class App extends React.Component {
   }
 
 	componentDidCatch(error, errorInfo) {
-		console.log('catched error :', error);
+		console.debug('catched error :', error);
 	}
 
-  async connect() {
+	connect = async () => {
     WebBleTransport.listen(async (error, device) => {
       if (device) {
 				const cardName = device.name;
-        const transport = await WebBleTransport.connect(device);
+				const transport = await WebBleTransport.connect(device);
 				this.setState({ transport, cardName });
       } else throw error;
     });
-  };
+  }
 
-  disconnect() {
+	disconnect = () => {
     WebBleTransport.disconnect(this.state.transport.device.id);
 		this.setState({ transport: {}, cardName: '' });
-  };
+  }
 
 	showConnectButton() {
 		return (this.state.cardName)
@@ -54,7 +54,7 @@ class App extends React.Component {
 							<p style={{ fontSize: 15, color: 'red' }}>{this.state.errorMsg}</p>
 						</Col>
 					</Row>)
-			: (<Row/>);
+			: (<Row style={{ margin: 25 }}/>);
 	}
   
   render() { return (
