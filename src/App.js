@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { HashRouter as Router } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import WebBleTransport from '@coolwallets/transport-web-ble';
@@ -11,31 +11,53 @@ import './App.css';
 const { appPublicKey, appPrivateKey } = getAppKeysOrGenerate();
 const appId = getAppIdOrNull();
 
-function App() {
-  const [transport, setTransport] = useState({});
-  const [cardName, setCardName] = useState('');
+class App extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = { transport: {}, cardName: '', errorMsg: '' };
+	}
 
-  const connect = async () => {
+	static getDerivedStateFromError(error) {
+    return { errorMsg: error.toString() };
+  }
+
+	componentDidCatch(error, errorInfo) {
+		console.log('catched error :', error);
+	}
+
+  async connect() {
     WebBleTransport.listen(async (error, device) => {
       if (device) {
-				setCardName(device.name);
+				const cardName = device.name;
         const transport = await WebBleTransport.connect(device);
-        setTransport(transport);
+				this.setState({ transport, cardName });
       } else throw error;
     });
   };
 
-  const disconnect = () => {
-    WebBleTransport.disconnect(transport.device.id);
-    setTransport({});
-		setCardName('');
+  disconnect() {
+    WebBleTransport.disconnect(this.state.transport.device.id);
+		this.setState({ transport: {}, cardName: '' });
   };
 
-	const connectButton = () => (cardName)
-    ? (<Button variant="outline-warning" style={{ margin: 5 }} onClick={disconnect}> Disconnect</Button>)
-    : (<Button variant="light" style={{ margin: 5 }} onClick={connect}>Connect</Button>);
+	showConnectButton() {
+		return (this.state.cardName)
+    	? (<Button variant="outline-warning" style={{ margin: 5 }} onClick={this.disconnect}> Disconnect</Button>)
+    	: (<Button variant="light" style={{ margin: 5 }} onClick={this.connect}>Connect</Button>);
+	}
+
+	showErrorMessage() {
+		return (this.state.errorMsg)
+			? (<Row style={{ margin: 25, background: 'white' }}>
+					<div style={{ width: '4px', background: 'red' }}/>
+						<Col style={{ paddingTop: 15 }}>
+							<p style={{ fontSize: 15, color: 'red' }}>{this.state.errorMsg}</p>
+						</Col>
+					</Row>)
+			: (<Row/>);
+	}
   
-  return (
+  render() { return (
     <div className='App'>
       <Router>
         <Container>
@@ -43,24 +65,20 @@ function App() {
 						<Col>
 							<MyNavBar/>
 						</Col>
-						<p style={{ paddingTop: 15, paddingRight: 10 }}>{cardName}</p>
-						{connectButton()}
+						<p style={{ paddingTop: 15, paddingRight: 10 }}>{this.state.cardName}</p>
+						{this.showConnectButton()}
 					</Row>
-          <Row style={{ margin: '5%' }}>
-            <Col>
-              <h2 style={{ padding: 5 }}> </h2>
-            </Col>
-          </Row>
+					{this.showErrorMessage()}
         </Container>
         <Routes
-          transport={transport}
+          transport={this.state.transport}
           appId={appId}
           appPrivateKey={appPrivateKey}
           appPublicKey={appPublicKey}
         />
       </Router>
     </div>
-  );
+	)}
 }
 
 export default App;
