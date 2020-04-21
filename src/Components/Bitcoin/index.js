@@ -18,20 +18,42 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
   const [balance, setBalance] = useState(0);
   const [address, setAddress] = useState('');
 
-  const getAddress = () => {
-    BTC.getAddress(BTC.ScriptType.P2SH_P2WPKH, addressIndex).then((address) => {
-      setAddress(address);
-      getBTCBalance(address).then((balance) => {
-        console.log(`Update BTC balance ${balance}`);
-        setBalance(balance);
-      });
-    });
+	const [isSigning, setIsSigning] = useState(false);
+
+  const getAddress = async () => {
+    const address = await BTC.getAddress(BTC.ScriptType.P2SH_P2WPKH, addressIndex);
+    setAddress(address);
+    const balance = await getBTCBalance(address);
+    console.log(`Update BTC balance ${balance}`);
+    setBalance(balance);
   };
+
+	const signTransaction = async () => {
+		setIsSigning(true);
+
+		console.log('signing ...');
+
+		const inputs = [{
+			preTxHash: 'ce3e845aedad19ad8ece79964cf474a2588011c42cfdd8c32aafa6b8aafcd178',
+			preIndex: 2,
+			preValue: '17867',
+			addressIndex: 0,
+		}];
+		const output = {
+			value: '400',
+			address: '36dNctMeLNp2TDC7pBx6GdXTLTVqy4oY92',
+		};
+
+		const transaction = await BTC.signTransaction(BTC.ScriptType.P2SH_P2WPKH, inputs, output);
+		console.log('transaction :', transaction);
+
+		setIsSigning(false);
+	};
 
   return (
     <Container style={{ textAlign: 'left' }}>
       <h5> Get Address</h5>
-      {/* Get Address from Card */}
+
       <Row>
         <Col xs={3}>
           <InputGroup className='mb-3'>
@@ -51,11 +73,20 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
           </InputGroup>
         </Col>
         <Col>
-          <FormText style={{ textAlign: 'left' }}> From {address} </FormText>
-          <FormText style={{ textAlign: 'left' }}> Balance: {balance} </FormText>
+          <FormText style={{ textAlign: 'left' }}>From: {address}</FormText>
+        </Col>
+        <Col>
+          <FormText style={{ textAlign: 'left' }}>Balance: {balance}</FormText>
         </Col>
       </Row>
-      <br></br>
+			<br/>
+
+      <h5>Sign Transaction</h5>
+			<Row>
+				<Button disabled={isSigning} variant='outline-success' onClick={signTransaction}>
+					{isSigning ? 'Signing ...' : 'Sign Transaction'}
+				</Button>
+			</Row>
       
     </Container>
   );
