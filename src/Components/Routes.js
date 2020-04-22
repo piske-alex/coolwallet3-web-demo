@@ -7,7 +7,7 @@ import BitcoinTest from './Bitcoin'
 function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
   return (
     <Switch>
-			<Redirect from='/' to='/wallet'/>
+			<Redirect from='/' to='/btc'/>
       <Route
         path='/wallet/'
         children={

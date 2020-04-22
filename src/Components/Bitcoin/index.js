@@ -12,7 +12,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 	if (transport && appPrivateKey && appId)
 		BTC = new cwsBTC(transport, appPrivateKey, appId);
 
-	const disabled = !BTC;
+	const disabled = false; // !BTC;
 
   const [accounts, setAccounts] = useState([{ addressIndex: 0, address: '', balance: '' }]);
 	const [toAddress, setToAddress] = useState('');
