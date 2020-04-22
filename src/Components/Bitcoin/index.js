@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Button, Row, Col, FormText, InputGroup, FormControl, ListGroup } from 'react-bootstrap';
+import { Container, Button, Row, Col, InputGroup, FormControl, ListGroup } from 'react-bootstrap';
 import cwsBTC from '@coolwallets/btc';
 import { getBTCBalance } from './utils'
 
@@ -17,18 +17,20 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 		setAccounts(copyAccounts);
 	};
 
-  const getAddress = async (id, e) => {
-		console.log('id :', id);
-		console.log('e :', e);
-		//		try {
-		//			const address = await BTC.getAddress(BTC.ScriptType.P2SH_P2WPKH, addressIndex);
-		//			setAddress(address);
-		//			const balance = await getBTCBalance(address);
-		//			console.log(`Update BTC balance ${balance}`);
-		//			setBalance(balance);
-		//		} catch (error) {
-		//			console.log('error :', error);
-		//		}
+  const getAddress = async (index) => {
+		try {
+			const addressIndex = accounts[index].addressIndex;
+			const address = await BTC.getAddress(BTC.ScriptType.P2SH_P2WPKH, addressIndex);
+			const balance = await getBTCBalance(address);
+			console.log(`Update BTC balance ${balance}`);
+
+			const copyAccounts = [...accounts];
+			copyAccounts[index].address = address;
+			copyAccounts[index].balance = balance;
+			setAccounts(copyAccounts);
+		} catch (error) {
+			console.log('error :', error);
+		}
   };
 
 	const signTransaction = async () => {
@@ -72,7 +74,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 
 function Account(index, account, onIndexChange, onButtonClick) {
 	return (
-		<ListGroup.Item style={{ border: 'none', background: '#282c34', paddingTop: '4px', paddingBottom: '4px'}} key={index}>
+		<ListGroup.Item style={{ border: 'none', background: '#242030', paddingTop: '6px', paddingBottom: '6px'}} key={index}>
 			<Row>
 				<Col md={3}>
 					<InputGroup>
@@ -83,7 +85,7 @@ function Account(index, account, onIndexChange, onButtonClick) {
 					    aria-describedby='basic-addon2'
 					  />
 					  <InputGroup.Append>
-					    <Button variant='outline-success' compact='true' onClick={onButtonClick}>
+							<Button variant='outline-success' compact='true' onClick={() => onButtonClick(index)}>
 					      Get Address
 					    </Button>
 					  </InputGroup.Append>
