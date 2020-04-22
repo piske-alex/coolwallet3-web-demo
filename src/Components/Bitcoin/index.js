@@ -1,31 +1,34 @@
 import React, { useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import FormText from 'react-bootstrap/FormText';
-import InputGroup from 'react-bootstrap/InputGroup';
-import FormControl from 'react-bootstrap/FormControl';
-import Container from 'react-bootstrap/Container';
+import { Container, Button, Row, Col, FormText, InputGroup, FormControl, ListGroup } from 'react-bootstrap';
 import cwsBTC from '@coolwallets/btc';
-
 import { getBTCBalance } from './utils'
 
-
 function BitcoinTest({ transport, appPrivateKey, appId }) {
-  const BTC = new cwsBTC(transport, appPrivateKey, appId);
+	let BTC;
+	if (transport && appPrivateKey && appId)
+		BTC = new cwsBTC(transport, appPrivateKey, appId);
 
-  const [addressIndex, setAddressIndex] = useState(0);
-  const [balance, setBalance] = useState(0);
-  const [address, setAddress] = useState('');
-
+  const [accounts, setAccounts] = useState([{ addressIndex: 0, address: '', balance: '' }]);
 	const [isSigning, setIsSigning] = useState(false);
 
-  const getAddress = async () => {
-    const address = await BTC.getAddress(BTC.ScriptType.P2SH_P2WPKH, addressIndex);
-    setAddress(address);
-    const balance = await getBTCBalance(address);
-    console.log(`Update BTC balance ${balance}`);
-    setBalance(balance);
+	const onIndexChange = (index, addressIndex) => {
+		const copyAccounts = [...accounts];
+		copyAccounts[index].addressIndex = addressIndex ? addressIndex : 0;
+		setAccounts(copyAccounts);
+	};
+
+  const getAddress = async (id, e) => {
+		console.log('id :', id);
+		console.log('e :', e);
+		//		try {
+		//			const address = await BTC.getAddress(BTC.ScriptType.P2SH_P2WPKH, addressIndex);
+		//			setAddress(address);
+		//			const balance = await getBTCBalance(address);
+		//			console.log(`Update BTC balance ${balance}`);
+		//			setBalance(balance);
+		//		} catch (error) {
+		//			console.log('error :', error);
+		//		}
   };
 
 	const signTransaction = async () => {
@@ -53,43 +56,48 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
   return (
     <Container style={{ textAlign: 'left' }}>
       <h5> Get Address</h5>
-
-      <Row>
-        <Col xs={3}>
-          <InputGroup className='mb-3'>
-            <FormControl
-              onChange={(event) => {
-                setAddressIndex(parseInt(event.target.value));
-              }}
-              value={addressIndex}
-              placeholder='Index'
-              aria-describedby='basic-addon2'
-            />
-            <InputGroup.Append>
-              <Button variant='outline-success' compact='true' onClick={getAddress}>
-                Get Address
-              </Button>
-            </InputGroup.Append>
-          </InputGroup>
-        </Col>
-        <Col>
-          <FormText style={{ textAlign: 'left' }}>From: {address}</FormText>
-        </Col>
-        <Col>
-          <FormText style={{ textAlign: 'left' }}>Balance: {balance}</FormText>
-        </Col>
-      </Row>
+			<ListGroup>
+				{accounts.map((account, index) => Account(index, account, onIndexChange, getAddress))}
+			</ListGroup>
 			<br/>
-
       <h5>Sign Transaction</h5>
 			<Row>
-				<Button disabled={isSigning} variant='outline-success' onClick={signTransaction}>
+				<Button disabled={(!BTC || isSigning)} variant='outline-success' onClick={signTransaction}>
 					{isSigning ? 'Signing ...' : 'Sign Transaction'}
 				</Button>
 			</Row>
-      
     </Container>
   );
+}
+
+function Account(index, account, onIndexChange, onButtonClick) {
+	return (
+		<ListGroup.Item style={{ border: 'none', background: '#282c34', paddingTop: '4px', paddingBottom: '4px'}} key={index}>
+			<Row>
+				<Col md={3}>
+					<InputGroup>
+					  <FormControl
+					    onChange={(event) => onIndexChange(index, parseInt(event.target.value))}
+					    value={account.addressIndex}
+					    placeholder={account.addressIndex}
+					    aria-describedby='basic-addon2'
+					  />
+					  <InputGroup.Append>
+					    <Button variant='outline-success' compact='true' onClick={onButtonClick}>
+					      Get Address
+					    </Button>
+					  </InputGroup.Append>
+					</InputGroup>
+				</Col>
+				<Col>
+					<InputGroup.Text style={{ textAlign: 'left' }}>From: {account.address}</InputGroup.Text>
+				</Col>
+				<Col md={3}>
+					<InputGroup.Text style={{ textAlign: 'left' }}>Balance: {account.balance}</InputGroup.Text>
+				</Col>
+			</Row>
+		</ListGroup.Item>
+	);
 }
 
 export default BitcoinTest;
