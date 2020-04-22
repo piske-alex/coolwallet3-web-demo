@@ -4,11 +4,18 @@ import cwsBTC from '@coolwallets/btc';
 import { getBTCBalance } from './utils'
 
 function BitcoinTest({ transport, appPrivateKey, appId }) {
+	console.log('transport :', transport);
+	console.log('appPrivateKey :', appPrivateKey);
+	console.log('appId :', appId);
+
 	let BTC;
 	if (transport && appPrivateKey && appId)
 		BTC = new cwsBTC(transport, appPrivateKey, appId);
 
+	const disabled = !BTC;
+
   const [accounts, setAccounts] = useState([{ addressIndex: 0, address: '', balance: '' }]);
+	const [toAddress, setToAddress] = useState('');
 	const [isSigning, setIsSigning] = useState(false);
 
 	const onIndexChange = (index, addressIndex) => {
@@ -32,6 +39,10 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 			console.log('error :', error);
 		}
   };
+
+	const onToAddressChange = (to) => {
+		setToAddress(to);
+	};
 
 	const signTransaction = async () => {
 		setIsSigning(true);
@@ -59,12 +70,26 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
     <Container style={{ textAlign: 'left' }}>
       <h5> Get Address</h5>
 			<ListGroup>
-				{accounts.map((account, index) => Account(index, account, onIndexChange, getAddress))}
+				{accounts.map((account, index) => Account(disabled, index, account, onIndexChange, getAddress))}
 			</ListGroup>
 			<br/>
       <h5>Sign Transaction</h5>
-			<Row>
-				<Button disabled={(!BTC || isSigning)} variant='outline-success' onClick={signTransaction}>
+			<Row style={{ padding: '16px', background: '#242030' }}>
+				<Col md={6}>
+					<InputGroup>
+						<InputGroup.Prepend>
+							<InputGroup.Text id="basic-addon1">To</InputGroup.Text>
+						</InputGroup.Prepend>
+					  <FormControl
+							disabled={disabled}
+					    onChange={(event) => onToAddressChange(event.target.value)}
+					    value={toAddress}
+					    placeholder='Recipient Address'
+					    aria-describedby='basic-addon1'
+					  />
+					</InputGroup>
+				</Col>
+				<Button disabled={(disabled || isSigning)} variant='outline-success' onClick={signTransaction}>
 					{isSigning ? 'Signing ...' : 'Sign Transaction'}
 				</Button>
 			</Row>
@@ -72,26 +97,26 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
   );
 }
 
-function Account(index, account, onIndexChange, onButtonClick) {
+function Account(disabled, index, account, onIndexChange, onButtonClick) {
 	return (
 		<ListGroup.Item style={{ border: 'none', background: '#242030', paddingTop: '6px', paddingBottom: '6px'}} key={index}>
 			<Row>
 				<Col md={3}>
 					<InputGroup>
 					  <FormControl
+							disabled={disabled}
 					    onChange={(event) => onIndexChange(index, parseInt(event.target.value))}
 					    value={account.addressIndex}
 					    placeholder={account.addressIndex}
-					    aria-describedby='basic-addon2'
 					  />
 					  <InputGroup.Append>
-							<Button variant='outline-success' compact='true' onClick={() => onButtonClick(index)}>
+							<Button disabled={disabled} variant='outline-success' compact='true' onClick={() => onButtonClick(index)}>
 					      Get Address
 					    </Button>
 					  </InputGroup.Append>
 					</InputGroup>
 				</Col>
-				<Col>
+				<Col md={6}>
 					<InputGroup.Text style={{ textAlign: 'left' }}>From: {account.address}</InputGroup.Text>
 				</Col>
 				<Col md={3}>

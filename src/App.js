@@ -14,7 +14,7 @@ const appId = getAppIdOrNull();
 class App extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { transport: {}, cardName: '', errorMsg: '' };
+		this.state = { transport: undefined, cardName: '', errorMsg: '' };
 	}
 
 	static getDerivedStateFromError(error) {
@@ -37,7 +37,7 @@ class App extends React.Component {
 
 	disconnect = () => {
     WebBleTransport.disconnect(this.state.transport.device.id);
-		this.setState({ transport: {}, cardName: '' });
+		this.setState({ transport: undefined, cardName: '' });
   }
 
 	showConnectButton() {
