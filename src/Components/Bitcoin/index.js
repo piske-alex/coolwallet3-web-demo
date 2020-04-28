@@ -12,14 +12,15 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 		console.log('appId :', appId);
 
 		BTC = new cwsBTC(transport, appPrivateKey, appId);
-		const defaultIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-		updateAccounts(defaultIndices);
+		updateAccounts(10);
 	}
 
 	const disabled = false; // !BTC;
 
-  const [fromAddressIndices, setFromAddressIndices] = useState([0]);
   const [accounts, setAccounts] = useState([{ address: '', balance: '' }]);
+	const [utxos, setUtxos] = useState([]);
+
+  const [fromAddressIndices, setFromAddressIndices] = useState([0]);
 	const [changeAddressIndex, setChangeAddressIndex] = useState(0);
 	const [toAddress, setToAddress] = useState('');
 	const [isSigning, setIsSigning] = useState(false);
@@ -34,16 +35,22 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 		setChangeAddressIndex(addressIndex);
 	};
 
-  async function updateAccounts(fromAddressIndices) {
+  async function updateAccounts(maxAddrIndex) {
 		try {
 			const addresses = [];
-			for (const index of fromAddressIndices) {
-				addresses.push(await BTC.getAddress(BTC.ScriptType.P2SH_P2WPKH, index));
+			const outScripts = [];
+			for (let index=0; index < maxAddrIndex; index++) {
+				const { address, outScript } = await BTC.getAddressAndOutScript(BTC.ScriptType.P2SH_P2WPKH, index);
+				addresses.push(address);
+				outScripts.push(outScript.toString('hex'));
 			}
-			const accounts = await getAccounts(addresses);
-			setAccounts(accounts);
+			const newAccounts = await getAccounts(addresses);
+			const newUtxos = await getUtxos(addresses, outScripts);
+			setAccounts(newAccounts);
+			setUtxos(newUtxos);
 
-			await getUtxos(addresses);
+			setFromAddressIndices([0, 1, 2]);
+
 			const fee = await getFee();
 			console.log('fee :', fee);
 
@@ -82,7 +89,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
     <Container style={{ textAlign: 'left' }}>
 
       <h5>From Addresses</h5>
-			<div style={{ padding: '16px', background: '#242030' }}>
+			<div style={{ background: '#242030' }}>
 				<ListGroup>
 					{fromAddressIndices.map((index, key) => showAccount(disabled, key, index, accounts, 'From', onFromIndexChange))}
 				</ListGroup>
@@ -90,7 +97,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 			<br/>
 
       <h5>Sign Transaction</h5>
-			<div style={{ padding: '16px', background: '#242030' }}>
+			<div style={{ background: '#242030' }}>
 				<Row>
 					<Col>
 
@@ -101,8 +108,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 								</ListGroup>
 							</Col>
 						</Row>
-						<br/>
-						<Row>
+						<Row style={{ padding: '20px' }}>
 							<Col md={8}>
 								<InputGroup>
 									<InputGroup.Prepend>
@@ -131,7 +137,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 
 function showAccount(disabled, itemKey, addressIndex, accounts, name, onIndexChange) {
 	return (
-		<ListGroup.Item style={{ border: 'none', background: '#242030', padding: '0px' }} key={itemKey}>
+		<ListGroup.Item style={{ border: 'none', background: '#242030' }} key={itemKey}>
 			<Row>
 				<Col md={4}>
 					<InputGroup.Text style={{ textAlign: 'left' }}>Balance: {accounts[addressIndex].balance}</InputGroup.Text>

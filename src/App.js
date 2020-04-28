@@ -31,7 +31,9 @@ class App extends React.Component {
 				const cardName = device.name;
 				const transport = await WebBleTransport.connect(device);
 				this.setState({ transport, cardName });
-      } else throw error;
+			} else {
+				console.log(error);
+			}
     });
   }
 
