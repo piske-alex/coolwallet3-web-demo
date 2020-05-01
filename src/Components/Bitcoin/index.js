@@ -1,7 +1,9 @@
+import BigNumber from 'bignumber.js';
 import React, { useState } from 'react';
 import { Container, Button, Row, Col, InputGroup, FormControl, ListGroup, DropdownButton, Dropdown } from 'react-bootstrap';
 import cwsBTC from '@coolwallets/btc';
-import { getFee, getAccounts, getUtxos } from './api'
+import { getFeeRate, getBalances, getUtxos } from './api';
+import { coinSelect } from './utils';
 
 let BTC;
 
@@ -17,13 +19,38 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 
 	const disabled = false; // !BTC;
 
-  const [accounts, setAccounts] = useState([{ address: '', balance: '' }]);
-	const [utxos, setUtxos] = useState([]);
-
+  const [accounts, setAccounts] = useState([{ address: '', balance: '', utxos: [] }]);
   const [fromAddressIndices, setFromAddressIndices] = useState([0]);
 	const [changeAddressIndex, setChangeAddressIndex] = useState(0);
 	const [toAddress, setToAddress] = useState('');
+	const [value, setValue] = useState('');
 	const [isSigning, setIsSigning] = useState(false);
+
+  async function updateAccounts(maxAddrIndex) {
+		try {
+			const addresses = [];
+			const outScripts = [];
+			for (let index=0; index < maxAddrIndex; index++) {
+				const { address, outScript } = await BTC.getAddressAndOutScript(BTC.ScriptType.P2SH_P2WPKH, index);
+				addresses.push(address);
+				outScripts.push(outScript.toString('hex'));
+			}
+			const balances = await getBalances(addresses);
+			const allUtxos = await getUtxos(addresses, outScripts);
+			const newAccounts = addresses.map((address, i) => {
+				const balance = balances[i];
+				const utxos = allUtxos[i] ? allUtxos[i] : [];
+				return { address, balance, utxos };
+			});
+			setAccounts(newAccounts);
+			console.log('newAccounts :', newAccounts);
+
+			setFromAddressIndices([0, 1, 2]);
+
+		} catch (error) {
+			console.log('error :', error);
+		}
+  };
 
 	const onFromIndexChange = (itemIndex, addressIndex) => {
 		const copyIndices = [...fromAddressIndices];
@@ -35,53 +62,51 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 		setChangeAddressIndex(addressIndex);
 	};
 
-  async function updateAccounts(maxAddrIndex) {
-		try {
-			const addresses = [];
-			const outScripts = [];
-			for (let index=0; index < maxAddrIndex; index++) {
-				const { address, outScript } = await BTC.getAddressAndOutScript(BTC.ScriptType.P2SH_P2WPKH, index);
-				addresses.push(address);
-				outScripts.push(outScript.toString('hex'));
-			}
-			const newAccounts = await getAccounts(addresses);
-			const newUtxos = await getUtxos(addresses, outScripts);
-			setAccounts(newAccounts);
-			setUtxos(newUtxos);
-
-			setFromAddressIndices([0, 1, 2]);
-
-			const fee = await getFee();
-			console.log('fee :', fee);
-
-		} catch (error) {
-			console.log('error :', error);
-		}
-  };
-
 	const onToAddressChange = (to) => {
 		setToAddress(to);
 	};
 
+	const onValueChange = (v) => {
+		setValue(v);
+	};
+
 	const signTransaction = async () => {
+		console.log('fromAddressIndices :', fromAddressIndices);
+		console.log('changeAddressIndex :', changeAddressIndex);
+
 		setIsSigning(true);
-
 		console.log('signing ...');
+		try {
+			if (isNaN(parseFloat(value))) throw new Error('value should be number');
 
-		const inputs = [{
-			preTxHash: 'ce3e845aedad19ad8ece79964cf474a2588011c42cfdd8c32aafa6b8aafcd178',
-			preIndex: 2,
-			preValue: '17867',
-			addressIndex: 0,
-		}];
-		const output = {
-			value: '400',
-			address: '36dNctMeLNp2TDC7pBx6GdXTLTVqy4oY92',
-		};
+			const fromIndices = new Set(fromAddressIndices);
+			let utxos = [];
+			for (let fromIndex of fromIndices) {
+				utxos = utxos.concat(accounts[fromIndex].utxos);
+			}
+			console.log('utxos :', utxos);
 
-		const transaction = await BTC.signTransaction(BTC.ScriptType.P2SH_P2WPKH, inputs, output);
-		console.log('transaction :', transaction);
+			const output = {
+				value: (new BigNumber(value)).shiftedBy(8).toFixed(),
+				address: toAddress,
+			};
+			console.log('output :', output);
+			const outputScriptType = BTC.addressToOutScript(toAddress).scriptType;
 
+			const feeRate = await getFeeRate();
+			console.log('feeRate :', feeRate);
+
+			const { inputs, change, fee } = coinSelect(utxos, BTC.ScriptType.P2SH_P2WPKH, output, outputScriptType, changeAddressIndex, feeRate);
+			console.log('inputs :', inputs);
+			console.log('change :', change);
+			console.log('fee :', fee);
+
+			const transaction = await BTC.signTransaction(BTC.ScriptType.P2SH_P2WPKH, inputs, output, change);
+			console.log('transaction :', transaction);
+
+		} catch (error) {
+			console.log('error :', error);
+		}
 		setIsSigning(false);
 	};
 
@@ -109,7 +134,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 							</Col>
 						</Row>
 						<Row style={{ padding: '20px' }}>
-							<Col md={8}>
+							<Col md={7}>
 								<InputGroup>
 									<InputGroup.Prepend>
 										<InputGroup.Text id="basic-addon1">To</InputGroup.Text>
@@ -123,9 +148,25 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 								  />
 								</InputGroup>
 							</Col>
-							<Button disabled={(disabled || isSigning)} variant='outline-success' onClick={signTransaction}>
-								{isSigning ? 'Signing ...' : 'Sign Transaction'}
-							</Button>
+							<Col md={3}>
+								<InputGroup>
+									<InputGroup.Prepend>
+										<InputGroup.Text id="basic-addon1">Value</InputGroup.Text>
+									</InputGroup.Prepend>
+								  <FormControl
+										disabled={disabled}
+								    onChange={(event) => onValueChange(event.target.value)}
+								    value={value}
+								    placeholder="0"
+								    aria-describedby='basic-addon1'
+								  />
+								</InputGroup>
+							</Col>
+							<Col md={2}>
+								<Button disabled={(disabled || isSigning)} variant='outline-success' onClick={signTransaction}>
+									{isSigning ? 'Signing ...' : 'Sign Transaction'}
+								</Button>
+							</Col>
 						</Row>
 
 					</Col>
@@ -150,7 +191,7 @@ function showAccount(disabled, itemKey, addressIndex, accounts, name, onIndexCha
 						{accounts.map((account, index) => <Dropdown.Item
 							key={index}
 							eventKey={index}
-							onSelect={(eventKey) => onIndexChange(itemKey, eventKey)}>{account.address}</Dropdown.Item>)}
+							onSelect={(eventKey) => onIndexChange(itemKey, parseInt(eventKey))}>{account.address}</Dropdown.Item>)}
 					</DropdownButton>
 				</Col>
 			</Row>
