@@ -26,7 +26,7 @@ export const getBalances = async addresses => {
 	} catch (error) {
 		console.log('error :', error);
 	}
-}
+};
 
 export const getUtxos = async (addresses, outScripts) => {
 	try {
@@ -39,12 +39,13 @@ export const getUtxos = async (addresses, outScripts) => {
 			const addressesWithPipe = addrs.join('|');
 			const res = await fetch(`https://blockchain.info/unspent?active=${addressesWithPipe}&cors=true`);
 			const resObject = await res.json();
+			console.log('resObject :', resObject);
 
 			const scripts = outScripts.slice(n, n + addressLimit);
 
 			for (const out of resObject.unspent_outputs) {
 				const preTxHash = out.tx_hash_big_endian;
-				const preIndex = out.tx_index;
+				const preIndex = out.tx_output_n;
 				const preValue = (new BigNumber(out.value_hex, 16)).toFixed();
 				const addressIndex = scripts.indexOf(out.script);
 
@@ -56,4 +57,20 @@ export const getUtxos = async (addresses, outScripts) => {
 	} catch (error) {
 		console.log('error :', error);
 	}
-}
+};
+
+export const sendTx = async (tx) => {
+	try {
+		const response = await fetch(`https://blockchain.info/pushtx?cors=true`, {
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+			},
+			method: 'POST',
+			body: `tx=${tx}`,
+		});
+		return await response.text();
+
+	} catch (error) {
+		console.log('error :', error);
+	}
+};
