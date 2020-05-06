@@ -6,6 +6,7 @@ import { getFeeRate, getBalances, getUtxos, sendTx } from './api';
 import { coinSelect } from './utils';
 
 let BTC;
+let ScriptType;
 
 function BitcoinTest({ transport, appPrivateKey, appId }) {
 	if (!BTC && transport && appPrivateKey && appId) {
@@ -14,6 +15,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 		console.log('appId :', appId);
 
 		BTC = new cwsBTC(transport, appPrivateKey, appId);
+		ScriptType = BTC.ScriptType.P2SH_P2WPKH;
 		updateAccounts(10);
 	}
 
@@ -34,7 +36,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 			const addresses = [];
 			const outScripts = [];
 			for (let index=0; index < maxAddrIndex; index++) {
-				const { address, outScript } = await BTC.getAddressAndOutScript(BTC.ScriptType.P2SH_P2WPKH, index);
+				const { address, outScript } = await BTC.getAddressAndOutScript(ScriptType, index);
 				addresses.push(address);
 				outScripts.push(outScript.toString('hex'));
 			}
@@ -108,12 +110,12 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 			console.log('output :', output);
 			const outputScriptType = BTC.addressToOutScript(toAddress).scriptType;
 
-			const { inputs, change, fee } = coinSelect(utxos, BTC.ScriptType.P2SH_P2WPKH, output, outputScriptType, changeAddressIndex, feeRate);
+			const { inputs, change, fee } = coinSelect(utxos, ScriptType, output, outputScriptType, changeAddressIndex, feeRate);
 			console.log('inputs :', inputs);
 			console.log('change :', change);
 			console.log('fee :', fee);
 
-			const transaction = await BTC.signTransaction(BTC.ScriptType.P2SH_P2WPKH, inputs, output, change);
+			const transaction = await BTC.signTransaction(ScriptType, inputs, output, change);
 			console.log('transaction :', transaction);
 
 			setTx(transaction);

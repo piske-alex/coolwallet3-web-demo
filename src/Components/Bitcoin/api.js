@@ -56,6 +56,7 @@ export const getUtxos = async (addresses, outScripts) => {
 		return utxos;
 	} catch (error) {
 		console.log('error :', error);
+		return [];
 	}
 };
 
