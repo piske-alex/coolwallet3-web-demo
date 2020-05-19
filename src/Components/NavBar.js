@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react";
 
-import Nav from 'react-bootstrap/Nav';
-import { useHistory } from 'react-router-dom';
+import Nav from "react-bootstrap/Nav";
+import { useHistory } from "react-router-dom";
 
 function MyNavBar() {
   const history = useHistory();
@@ -11,7 +11,7 @@ function MyNavBar() {
       <Nav.Item>
         <Nav.Link
           onClick={() => {
-            history.push('wallet');
+            history.push("wallet");
           }}
         >
           Wallet
@@ -20,10 +20,19 @@ function MyNavBar() {
       <Nav.Item>
         <Nav.Link
           onClick={() => {
-            history.push('eth');
+            history.push("eth");
           }}
         >
           ETH
+        </Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link
+          onClick={() => {
+            history.push("xrp");
+          }}
+        >
+          XRP
         </Nav.Link>
       </Nav.Item>
     </Nav>
