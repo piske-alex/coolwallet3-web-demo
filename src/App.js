@@ -1,61 +1,103 @@
-import React, { useState } from 'react';
-import { HashRouter as Router } from 'react-router-dom';
-import './App.css';
-import Container from 'react-bootstrap/Container';
-import { Row, Col } from 'react-bootstrap';
+import React from "react";
+import { HashRouter as Router } from "react-router-dom";
+import { Container, Row, Col, Button } from "react-bootstrap";
+import WebBleTransport from "@coolwallets/transport-web-ble";
 
-import MyNavBar from './Components/NavBar';
-import Connection from './Components/Connection';
-
-import Routes from './Components/Routes'
-
-
-import WebBleTransport from '@coolwallets/transport-web-ble';
-import { getAppKeysOrGenerate, getAppIdOrNull } from './Utils/sdkUtil';
+import { getAppKeysOrGenerate, getAppIdOrNull } from "./Utils/sdkUtil";
+import Routes from "./Components/Routes";
+import MyNavBar from "./Components/NavBar";
+import "./App.css";
 
 const { appPublicKey, appPrivateKey } = getAppKeysOrGenerate();
 const appId = getAppIdOrNull();
 
-function App() {
-  const [transport, setTransport] = useState({});
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { transport: undefined, cardName: "", errorMsg: "" };
+  }
 
-  const connect = async () => {
+  static getDerivedStateFromError(error) {
+    return { errorMsg: error.toString() };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.debug("catched error :", error);
+  }
+
+  connect = async () => {
     WebBleTransport.listen(async (error, device) => {
       if (device) {
+        const cardName = device.name;
         const transport = await WebBleTransport.connect(device);
-        setTransport(transport);
-      } else throw error;
+        this.setState({ transport, cardName });
+      } else {
+        console.log(error);
+      }
     });
   };
 
-  const disconnect = () => {
-    WebBleTransport.disconnect(transport.device.id);
-    setTransport({});
+  disconnect = () => {
+    WebBleTransport.disconnect(this.state.transport.device.id);
+    this.setState({ transport: undefined, cardName: "" });
   };
 
-  return (
-    <div className='App'>
-      <Router>
-        <MyNavBar />
-        <Container>
-          <Row style={{ margin: '5%' }}>
-            <Col>
-              <h2 style={{ padding: 5 }}> SDK Test </h2>
-            </Col>
-            <Col>
-              <Connection connect={connect} disconnect={disconnect}></Connection>
-            </Col>
-          </Row>
-        </Container>
-        <Routes
-          transport={transport}
-          appId={appId}
-          appPrivateKey={appPrivateKey}
-          appPublicKey={appPublicKey}
-        />
-      </Router>
-    </div>
-  );
+  showConnectButton() {
+    return this.state.cardName ? (
+      <Button
+        variant="outline-warning"
+        style={{ margin: 5 }}
+        onClick={this.disconnect}
+      >
+        {" "}
+        Disconnect
+      </Button>
+    ) : (
+        <Button variant="light" style={{ margin: 5 }} onClick={this.connect}>
+          Connect
+        </Button>
+      );
+  }
+
+  showErrorMessage() {
+    return this.state.errorMsg ? (
+      <Row style={{ margin: 25, background: "white" }}>
+        <div style={{ width: "4px", background: "red" }} />
+        <Col style={{ paddingTop: 15 }}>
+          <p style={{ fontSize: 15, color: "red" }}>{this.state.errorMsg}</p>
+        </Col>
+      </Row>
+    ) : (
+        <Row style={{ margin: 25 }} />
+      );
+  }
+
+  render() {
+    return (
+      <div className="App">
+        <Router>
+          <Container>
+            <Row>
+              <Col>
+                <MyNavBar />
+              </Col>
+              <p style={{ paddingTop: 15, paddingRight: 10 }}>
+                {this.state.cardName}
+              </p>
+              {this.showConnectButton()}
+            </Row>
+            {this.showErrorMessage()}
+          </Container>
+          <Routes
+            transport={this.state.transport}
+            appId={appId}
+            appPrivateKey={appPrivateKey}
+            appPublicKey={appPublicKey}
+          />
+        </Router>
+      </div>
+    );
+  }
 }
 
 export default App;

@@ -1,13 +1,14 @@
 import React from "react";
-import { HashRouter as Switch, Route } from "react-router-dom";
+import { HashRouter as Switch, Route, Redirect } from "react-router-dom";
 import ManageWallet from "./WalletManagement";
 import ETHTest from "./Ethereum";
 import XRPTest from "./XRP";
-// import BitcoinTest from './Bitcoin/index'
+import BitcoinTest from "./Bitcoin";
 
 function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
   return (
     <Switch>
+      <Redirect from="/" to="/btc" />
       <Route
         path="/wallet/"
         children={
@@ -40,7 +41,16 @@ function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
           />
         }
       />
-      <Route path="/" children={<></>} />
+      <Route
+        path="/btc"
+        children={
+          <BitcoinTest
+            transport={transport}
+            appPrivateKey={appPrivateKey}
+            appId={appId}
+          />
+        }
+      />
     </Switch>
   );
 }
