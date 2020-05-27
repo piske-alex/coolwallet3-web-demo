@@ -1,15 +1,16 @@
-import React from 'react';
-import { HashRouter as Switch, Route, Redirect } from 'react-router-dom';
-import ManageWallet from './WalletManagement';
-import ETHTest from './Ethereum';
-import BitcoinTest from './Bitcoin'
+import React from "react";
+import { HashRouter as Switch, Route, Redirect } from "react-router-dom";
+import ManageWallet from "./WalletManagement";
+import ETHTest from "./Ethereum";
+import XRPTest from "./XRP";
+import BitcoinTest from "./Bitcoin";
 
 function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
   return (
     <Switch>
-			<Redirect from='/' to='/btc'/>
+      <Redirect from="/" to="/btc" />
       <Route
-        path='/wallet/'
+        path="/wallet/"
         children={
           <ManageWallet
             transport={transport}
@@ -21,12 +22,34 @@ function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
         appId={appId}
       />
       <Route
-        path='/eth'
-        children={<ETHTest transport={transport} appPrivateKey={appPrivateKey} appId={appId} />}
+        path="/eth"
+        children={
+          <ETHTest
+            transport={transport}
+            appPrivateKey={appPrivateKey}
+            appId={appId}
+          />
+        }
       />
       <Route
-        path='/btc'
-        children={<BitcoinTest transport={transport} appPrivateKey={appPrivateKey} appId={appId} />}
+        path="/xrp"
+        children={
+          <XRPTest
+            transport={transport}
+            appPrivateKey={appPrivateKey}
+            appId={appId}
+          />
+        }
+      />
+      <Route
+        path="/btc"
+        children={
+          <BitcoinTest
+            transport={transport}
+            appPrivateKey={appPrivateKey}
+            appId={appId}
+          />
+        }
       />
     </Switch>
   );
