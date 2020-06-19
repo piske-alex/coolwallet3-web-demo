@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, InputGroup, FormControl, Row, Col, Button } from 'react-bootstrap';
-import { AlreadyRegistered } from '@coolwallets/errors';
+import { error as Error } from '@coolwallets/core';
 
 function SettingPage({ wallet, appPublicKey }) {
   const [password, setPassword] = useState('12345678');
@@ -29,7 +29,8 @@ function SettingPage({ wallet, appPublicKey }) {
       localStorage.setItem('appId', appId);
       wallet.setAppId(appId);
     } catch (error) {
-      if (error instanceof AlreadyRegistered) {
+      // TODO
+      if (error instanceof Error.AlreadyRegistered) {
         console.log(`Already registered`);
       } else {
         console.error(error);
@@ -43,12 +44,12 @@ function SettingPage({ wallet, appPublicKey }) {
     setIsResetting(true)
     try {
       await wallet.resetCard();
-    } catch(error) {
+    } catch (error) {
       console.error(error)
     } finally {
       setIsResetting(false)
     }
-    
+
   }
 
   return (
@@ -63,7 +64,7 @@ function SettingPage({ wallet, appPublicKey }) {
             style={{ margin: 5 }}
             onClick={resetCard}
           >
-            { isResetting ? 'Please Press Button...' : 'Reset Card'}
+            {isResetting ? 'Please Press Button...' : 'Reset Card'}
           </Button>
         </Col>
         <Col xs={4}>
@@ -85,19 +86,19 @@ function SettingPage({ wallet, appPublicKey }) {
                   registerWithCard(password);
                 }}
               >
-                { isRegistering? 'Please Press Button...' : 'Register'}
+                {isRegistering ? 'Please Press Button...' : 'Register'}
               </Button>
             </InputGroup.Append>
           </InputGroup>
         </Col>
 
         <Col cs={3}>
-          <Button 
+          <Button
             disabled={isRevokingPassword}
-            variant='outline-light' 
-            style={{ margin: 5 }} 
+            variant='outline-light'
+            style={{ margin: 5 }}
             onClick={getPassword}>
-            { isRevokingPassword ? 'Loading' :'Get password'}
+            {isRevokingPassword ? 'Loading' : 'Get password'}
           </Button>
         </Col>
         <Col cs={3}>
