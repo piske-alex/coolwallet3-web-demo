@@ -66,7 +66,7 @@ function XRPTest({ transport, appPrivateKey, appId }) {
         Destination: "rB8rz3nCuHDviKErGMT8xuFHZ8ZvdMfF91",
       };
 
-      const signedTx = await XRP.signPayment(param, addressIndex); //.then((signedTx) => {
+      const signedTx = await XRP.signTransaction(param, addressIndex); //.then((signedTx) => {
       console.log("signedTx: " + signedTx);
     } catch (error) {
       console.error(error);
