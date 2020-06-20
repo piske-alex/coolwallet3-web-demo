@@ -59,7 +59,7 @@ function XRPTest({ transport, appPrivateKey, appId }) {
         Sequence: "11", //"0000000b",
         DestinationTag: "00000000",
         LastLedgerSequence: "599", //"1b02294797",
-        Amount: (parseInt(value) * Math.pow(10, 6)).toString(),
+        Amount: (parseFloat(value) * Math.pow(10, 6)).toString(),
         Fee: "12", //"400000000000000c",
         //SigningPubKey,
         //Account,
