@@ -27,6 +27,7 @@ class App extends React.Component {
 
   connect = async () => {
     WebBleTransport.listen(async (error, device) => {
+      console.log(device)
       if (device) {
         const cardName = device.name;
         const transport = await WebBleTransport.connect(device);

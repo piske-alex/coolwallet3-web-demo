@@ -1,8 +1,9 @@
 import React from 'react';
 
 import Wallet from './Wallet'
-import Register from './Settings'
-import { wallet as coreWallet } from '@coolwallet/core';
+import Settings from './Settings'
+import Switches from './Switches'
+import CoolWallet from '@coolwallets/wallet';
 
 function WalletManagement({ appPrivateKey, appPublicKey, appId, transport }) {
 
@@ -10,7 +11,8 @@ function WalletManagement({ appPrivateKey, appPublicKey, appId, transport }) {
   return (
     <>
       <Wallet wallet={wallet} />
-      <Register wallet={wallet} appPublicKey={appPublicKey} />
+      <Settings wallet={wallet} appPublicKey={appPublicKey} />
+      <Switches />
     </>
   )
 }
