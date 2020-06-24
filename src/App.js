@@ -1,7 +1,7 @@
 import React from "react";
 import { HashRouter as Router } from "react-router-dom";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import WebBleTransport from "@coolwallets/transport-web-ble";
+import WebBleTransport from "@coolwallet/transport-web-ble";
 
 import { getAppKeysOrGenerate, getAppIdOrNull } from "./Utils/sdkUtil";
 import Routes from "./Components/Routes";

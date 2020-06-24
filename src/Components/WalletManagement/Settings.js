@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, InputGroup, FormControl, Row, Col, Button } from 'react-bootstrap';
-import { error as Error } from '@coolwallets/core';
+import { error as Error } from '@coolwallet/core';
 
 function SettingPage({ wallet, appPublicKey }) {
   const [password, setPassword] = useState('12345678');

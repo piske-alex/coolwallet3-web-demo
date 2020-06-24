@@ -11,7 +11,7 @@ import {
 } from "react-bootstrap";
 import Web3 from "web3";
 import GasMenu from "./GasMenu";
-import cwsETH from "@coolwallets/eth";
+import cwsETH from "@coolwallet/eth";
 
 const chainId = 1;
 const web3 = new Web3(

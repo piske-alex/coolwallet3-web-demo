@@ -7,7 +7,6 @@
     "@coolwallet/btc": "~0.1.0-beta.0",
     "@coolwallet/eth": "~0.1.0-beta.0",
     "@coolwallet/transport-web-ble": "~0.1.0-beta.0",
-    "@coolwallet/wallet": "~0.1.0-beta.0",
     "@coolwallet/xrp": "~0.1.0-beta.0",
     "axios": "^0.19.2",
     "bignumber.js": "^9.0.0",

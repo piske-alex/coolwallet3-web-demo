@@ -9,7 +9,7 @@ import {
   Form,
   Button,
 } from "react-bootstrap";
-import cwsXRP from "@coolwallets/xrp";
+import cwsXRP from "@coolwallet/xrp";
 import axios from "axios";
 import * as API from "./api";
 

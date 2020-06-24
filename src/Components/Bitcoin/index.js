@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import React, { useState } from 'react';
 import { Container, Button, Row, Col, InputGroup, FormControl, ListGroup, DropdownButton, Dropdown } from 'react-bootstrap';
-import cwsBTC from '@coolwallets/btc';
+import cwsBTC from '@coolwallet/btc';
 import { getFeeRate, getBalances, getUtxos, sendTx } from './api';
 import { coinSelect } from './utils';
 

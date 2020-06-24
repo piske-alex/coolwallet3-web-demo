@@ -2,11 +2,11 @@ import React from 'react';
 
 import Wallet from './Wallet'
 import Register from './Settings'
-import CoolWallet from '@coolwallets/wallet';
+import { wallet as coreWallet } from '@coolwallet/core';
 
 function WalletManagement({ appPrivateKey, appPublicKey, appId, transport }) {
 
-  const wallet = new CoolWallet(transport, appPrivateKey, appId);
+  const wallet = new coreWallet(transport, appPrivateKey, appId);
   return (
     <>
       <Wallet wallet={wallet} />
