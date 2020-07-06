@@ -94,9 +94,8 @@ function EthTest({ transport, appPrivateKey, appId }) {
         //   decimals: 18,
         // },
       };
-
       const signedTx = await ETH.signTransaction(param, addressIndex); //.then((signedTx) => {
-
+      console.log("Signature: " + signedTx)
       /*web3.eth.sendSignedTransaction(signedTx, (err, txHash) => {
         if (err) {
           console.error(err);
