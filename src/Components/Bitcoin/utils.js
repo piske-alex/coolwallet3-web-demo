@@ -16,6 +16,13 @@ const TxBytes = {
 	P2WPKH_DUST_THRESHOLD: 294,
 }
 
+const ScriptType = {
+	P2PKH: 0,
+	P2SH_P2WPKH: 1,
+	P2WPKH: 2,
+	P2WSH: 3,
+}
+
 export function coinSelect(utxos, inputScriptType, output, outputScriptType, changeAddressIndex, feeRate) {
 	console.log('inputScriptType :', inputScriptType);
 	console.log('outputScriptType :', outputScriptType);
@@ -23,15 +30,15 @@ export function coinSelect(utxos, inputScriptType, output, outputScriptType, cha
 	let inScriptBytes;
 	let changeScriptBytes;
 	let changeDustThreshold;
-	if (inputScriptType === 'P2PKH') {
+	if (inputScriptType === ScriptType.P2PKH) {
 		inScriptBytes = TxBytes.P2PKH_IN_SCRIPT;
 		changeScriptBytes = TxBytes.P2PKH_OUT_SCRIPT;
 		changeDustThreshold = TxBytes.P2PKH_DUST_THRESHOLD;
-	} else if (inputScriptType === 'P2SH_P2WPKH') {
+	} else if (inputScriptType === ScriptType.P2SH_P2WPKH) {
 		inScriptBytes = TxBytes.P2SH_P2WPKH_IN_SCRIPT;
 		changeScriptBytes = TxBytes.P2SH_P2WPKH_OUT_SCRIPT;
 		changeDustThreshold = TxBytes.P2SH_P2WPKH_DUST_THRESHOLD;
-	} else if (inputScriptType === 'P2WPKH') {
+	} else if (inputScriptType === ScriptType.P2WPKH) {
 		inScriptBytes = TxBytes.P2WPKH_IN_SCRIPT;
 		changeScriptBytes = TxBytes.P2WPKH_OUT_SCRIPT;
 		changeDustThreshold = TxBytes.P2WPKH_DUST_THRESHOLD;
@@ -40,13 +47,13 @@ export function coinSelect(utxos, inputScriptType, output, outputScriptType, cha
 	}
 	let outScriptBytes;
 	let outDustThreshold;
-	if (outputScriptType === 'P2PKH') {
+	if (outputScriptType === ScriptType.P2PKH) {
 		outScriptBytes = TxBytes.P2PKH_OUT_SCRIPT;
 		outDustThreshold = TxBytes.P2PKH_DUST_THRESHOLD;
-	} else if (outputScriptType === 'P2SH_P2WPKH') {
+	} else if (outputScriptType === ScriptType.P2SH_P2WPKH) {
 		outScriptBytes = TxBytes.P2SH_P2WPKH_OUT_SCRIPT;
 		outDustThreshold = TxBytes.P2SH_P2WPKH_DUST_THRESHOLD;
-	} else if (outputScriptType === 'P2WPKH') {
+	} else if (outputScriptType === ScriptType.P2WPKH) {
 		outScriptBytes = TxBytes.P2WPKH_OUT_SCRIPT;
 		outDustThreshold = TxBytes.P2WPKH_DUST_THRESHOLD;
 	} else {
@@ -61,12 +68,12 @@ export function coinSelect(utxos, inputScriptType, output, outputScriptType, cha
 
 	const baseBytes = TxBytes.EMPTY + TxBytes.OUTPUT_BASE + outScriptBytes;
 	console.log('baseBytes :', baseBytes);
-  let fee = baseBytes * feeRate;
+	let fee = baseBytes * feeRate;
 	console.log('fee :', fee);
-  let inAccum = 0;
-  let inputs = [];
+	let inAccum = 0;
+	let inputs = [];
 
-	for (let i=0; i < sortedUtxos.length; i++) {
+	for (let i = 0; i < sortedUtxos.length; i++) {
 		const utxo = sortedUtxos[i];
 		const inputBytes = TxBytes.INPUT_BASE + inScriptBytes;
 		fee += inputBytes * feeRate;

@@ -9,7 +9,7 @@ import {
   Form,
   Button,
 } from "react-bootstrap";
-import cwsXRP from "@coolwallets/xrp";
+import cwsXRP from "@coolwallet/xrp";
 import axios from "axios";
 import * as API from "./api";
 
@@ -59,14 +59,14 @@ function XRPTest({ transport, appPrivateKey, appId }) {
         Sequence: "11", //"0000000b",
         DestinationTag: "00000000",
         LastLedgerSequence: "599", //"1b02294797",
-        Amount: (parseInt(value) * Math.pow(10, 6)).toString(),
+        Amount: (parseFloat(value) * Math.pow(10, 6)).toString(),
         Fee: "12", //"400000000000000c",
         //SigningPubKey,
         //Account,
         Destination: "rB8rz3nCuHDviKErGMT8xuFHZ8ZvdMfF91",
       };
 
-      const signedTx = await XRP.signPayment(param, addressIndex); //.then((signedTx) => {
+      const signedTx = await XRP.signTransaction(param, addressIndex); //.then((signedTx) => {
       console.log("signedTx: " + signedTx);
     } catch (error) {
       console.error(error);

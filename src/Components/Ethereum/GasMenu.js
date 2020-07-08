@@ -24,9 +24,9 @@ class GasMenu extends Component {
   render() {
     return (
       // <Row style={{marginLeft: 5}}>
-      <ButtonGroup block >
+      <ButtonGroup >
         <Button
-          active = {this.state.selected === 1}
+          active={this.state.selected === 1}
           variant='secondary'
           onClick={() => {
             this.props.handler(this.state.fast)
@@ -36,7 +36,7 @@ class GasMenu extends Component {
           Fast: {this.state.fast}
         </Button>
         <Button
-        active = {this.state.selected === 2}
+          active={this.state.selected === 2}
           variant='secondary'
           onClick={() => {
             this.props.handler(this.state.avg)
@@ -46,7 +46,7 @@ class GasMenu extends Component {
           Avg: {this.state.avg}
         </Button>
         <Button
-        active = {this.state.selected === 3}
+          active={this.state.selected === 3}
           variant='secondary'
           onClick={() => {
             this.props.handler(this.state.slow)

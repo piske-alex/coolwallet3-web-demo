@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import React, { useState } from 'react';
 import { Container, Button, Row, Col, InputGroup, FormControl, ListGroup, DropdownButton, Dropdown } from 'react-bootstrap';
-import cwsBTC from '@coolwallets/btc';
+import cwsBTC from '@coolwallet/btc';
 import { getFeeRate, getBalances, getUtxos, sendTx } from './api';
 import { coinSelect } from './utils';
 
@@ -21,8 +21,8 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 
 	const disabled = !BTC;
 
-  const [accounts, setAccounts] = useState([{ address: '', balance: '', utxos: [] }]);
-  const [fromAddressIndices, setFromAddressIndices] = useState([0]);
+	const [accounts, setAccounts] = useState([{ address: '', balance: '', utxos: [] }]);
+	const [fromAddressIndices, setFromAddressIndices] = useState([0]);
 	const [changeAddressIndex, setChangeAddressIndex] = useState(0);
 	const [toAddress, setToAddress] = useState('');
 	const [value, setValue] = useState('');
@@ -31,11 +31,11 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 	const [tx, setTx] = useState('');
 	const [isSending, setIsSending] = useState(false);
 
-  async function updateAccounts(maxAddrIndex) {
+	async function updateAccounts(maxAddrIndex) {
 		try {
 			const addresses = [];
 			const outScripts = [];
-			for (let index=0; index < maxAddrIndex; index++) {
+			for (let index = 0; index < maxAddrIndex; index++) {
 				const { address, outScript } = await BTC.getAddressAndOutScript(ScriptType, index);
 				addresses.push(address);
 				outScripts.push(outScript.toString('hex'));
@@ -59,7 +59,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 		} catch (error) {
 			console.log('error :', error);
 		}
-  };
+	};
 
 	const onFromIndexChange = (itemIndex, addressIndex) => {
 		const copyIndices = [...fromAddressIndices];
@@ -136,18 +136,18 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 		setIsSending(false);
 	};
 
-  return (
-    <Container style={{ textAlign: 'left' }}>
+	return (
+		<Container style={{ textAlign: 'left' }}>
 
-      <h5>From Addresses</h5>
+			<h5>From Addresses</h5>
 			<div style={{ background: '#242030' }}>
 				<ListGroup>
 					{fromAddressIndices.map((index, key) => showAccount(disabled, key, index, accounts, 'From', onFromIndexChange))}
 				</ListGroup>
 			</div>
-			<br/>
+			<br />
 
-      <h5>Sign Transaction</h5>
+			<h5>Sign Transaction</h5>
 			<div style={{ background: '#242030' }}>
 				<Row>
 					<Col>
@@ -165,13 +165,13 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 									<InputGroup.Prepend>
 										<InputGroup.Text id="basic-addon1">To</InputGroup.Text>
 									</InputGroup.Prepend>
-								  <FormControl
+									<FormControl
 										disabled={disabled}
-								    onChange={(event) => onToAddressChange(event.target.value)}
-								    value={toAddress}
-								    placeholder="Recipient's Address"
-								    aria-describedby='basic-addon1'
-								  />
+										onChange={(event) => onToAddressChange(event.target.value)}
+										value={toAddress}
+										placeholder="Recipient's Address"
+										aria-describedby='basic-addon1'
+									/>
 								</InputGroup>
 							</Col>
 							<Col md={2}>
@@ -179,13 +179,13 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 									<InputGroup.Prepend>
 										<InputGroup.Text id="basic-addon1">Value</InputGroup.Text>
 									</InputGroup.Prepend>
-								  <FormControl
+									<FormControl
 										disabled={disabled}
-								    onChange={(event) => onValueChange(event.target.value)}
-								    value={value}
-								    placeholder="0"
-								    aria-describedby='basic-addon1'
-								  />
+										onChange={(event) => onValueChange(event.target.value)}
+										value={value}
+										placeholder="0"
+										aria-describedby='basic-addon1'
+									/>
 								</InputGroup>
 							</Col>
 							<Col md={2}>
@@ -193,13 +193,13 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 									<InputGroup.Prepend>
 										<InputGroup.Text id="basic-addon1">FeeRate</InputGroup.Text>
 									</InputGroup.Prepend>
-								  <FormControl
+									<FormControl
 										disabled={disabled}
-								    onChange={(event) => onFeeRateChange(event.target.value)}
-								    value={feeRate}
-								    placeholder="0"
-								    aria-describedby='basic-addon1'
-								  />
+										onChange={(event) => onFeeRateChange(event.target.value)}
+										value={feeRate}
+										placeholder="0"
+										aria-describedby='basic-addon1'
+									/>
 								</InputGroup>
 							</Col>
 							<Col md={2}>
@@ -212,9 +212,9 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 					</Col>
 				</Row>
 			</div>
-			<br/>
+			<br />
 
-      <h5>Send Transaction</h5>
+			<h5>Send Transaction</h5>
 			<div style={{ background: '#242030' }}>
 				<Row style={{ padding: '20px' }}>
 					<Col md={10}>
@@ -222,13 +222,13 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 							<InputGroup.Prepend>
 								<InputGroup.Text id="basic-addon1">To</InputGroup.Text>
 							</InputGroup.Prepend>
-						  <FormControl
+							<FormControl
 								disabled={disabled}
-						    onChange={(event) => onTxChange(event.target.value)}
-						    value={tx}
-						    placeholder="Signed Transaction"
-						    aria-describedby='basic-addon1'
-						  />
+								onChange={(event) => onTxChange(event.target.value)}
+								value={tx}
+								placeholder="Signed Transaction"
+								aria-describedby='basic-addon1'
+							/>
 						</InputGroup>
 					</Col>
 					<Col md={2}>
@@ -238,8 +238,8 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 					</Col>
 				</Row>
 			</div>
-    </Container>
-  );
+		</Container>
+	);
 }
 
 function showAccount(disabled, itemKey, addressIndex, accounts, name, onIndexChange) {

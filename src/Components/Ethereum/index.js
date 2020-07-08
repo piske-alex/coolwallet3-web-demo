@@ -11,7 +11,7 @@ import {
 } from "react-bootstrap";
 import Web3 from "web3";
 import GasMenu from "./GasMenu";
-import cwsETH from "@coolwallets/eth";
+import cwsETH from "@coolwallet/eth";
 
 const chainId = 1;
 const web3 = new Web3(
@@ -94,9 +94,8 @@ function EthTest({ transport, appPrivateKey, appId }) {
         //   decimals: 18,
         // },
       };
-
       const signedTx = await ETH.signTransaction(param, addressIndex); //.then((signedTx) => {
-
+      console.log("Signature: " + signedTx)
       /*web3.eth.sendSignedTransaction(signedTx, (err, txHash) => {
         if (err) {
           console.error(err);
