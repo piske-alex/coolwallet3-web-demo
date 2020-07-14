@@ -16,14 +16,13 @@ const TxBytes = {
 	P2WPKH_DUST_THRESHOLD: 294,
 }
 
-const ScriptType = {
+/*const ScriptType = {
 	P2PKH: 0,
 	P2SH_P2WPKH: 1,
 	P2WPKH: 2,
 	P2WSH: 3,
-}
-
-export function coinSelect(utxos, inputScriptType, output, outputScriptType, changeAddressIndex, feeRate) {
+}*/
+export function coinSelect(utxos, inputScriptType, output, outputScriptType, changeAddressIndex, feeRate, ScriptType) {
 	console.log('inputScriptType :', inputScriptType);
 	console.log('outputScriptType :', outputScriptType);
 
