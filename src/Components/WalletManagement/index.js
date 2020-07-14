@@ -7,8 +7,8 @@ function WalletManagement({ appPrivateKey, appPublicKey, appId, transport }) {
   const wallet = new CoolWallet(transport, appPrivateKey, appId);
   return (
     <>
-      <Wallet wallet={wallet} />
-      <Settings wallet={wallet} appPublicKey={appPublicKey} />
+      <Wallet wallet={wallet} transport={transport} />
+      <Settings wallet={wallet} appId={appId} appPublicKey={appPublicKey} appPrivateKey={appPrivateKey} transport={transport} />
     </>
   )
 }
