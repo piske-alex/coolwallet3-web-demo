@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { InputGroup, FormControl, Button, Row, Container, Col } from 'react-bootstrap';
 const bip39 = require('bip39');
 
-function Wallet({ wallet }) {
+function Wallet({ wallet, transport }) {
 
   const [isSettingSeedByCreate, setIsSettingSeedByCreate] = useState(false);
   const [isSettingSeedByRecover, setIsSettingSeedByRecover] = useState(false);
@@ -33,9 +33,9 @@ function Wallet({ wallet }) {
     }
     console.log(`${method} setting seed: ${mnemonic}`);
     const hex = bip39.mnemonicToSeedSync(mnemonic).toString('hex'); // ''
-    console.log(hex)
+    console.log(mnemonic)
     try {
-      await wallet.setSeed(hex)
+      await wallet.setSeed(mnemonic)
     } catch(error){
       console.error(error)
     } finally {
@@ -46,7 +46,7 @@ function Wallet({ wallet }) {
 
   const createWallet = async() => {
     try {
-      await wallet.createWallet(12);
+      await wallet.createSeedByCard(12);
     } catch (error) {
       console.error(error)
     }
