@@ -151,7 +151,7 @@ function SettingPage({ wallet, appId, appPublicKey, appPrivateKey, transport }) 
   const switchLockStatus = async () => {
     setSwitchLockStatus(true)
     try {
-      await apdu.pair.switchLockStatus(transport, appId, appPrivateKey, false)
+      await apdu.pair.switchLockStatus(transport, appId, appPrivateKey, true)
     } catch (error) {
       console.error(error)
     } finally {

@@ -17,7 +17,7 @@ function Utility({ appPrivateKey, appPublicKey, appId, transport }) {
   const showFullAddressd = async () => {
     setShowFullAddressStatus(true)
     try {
-      await apdu.info.toggleDisplayAddress(transport, appId, appPrivateKey, false);
+      await apdu.info.toggleDisplayAddress(transport, appId, appPrivateKey, changeShowFullAddressFlag);
       setshowFullAddress("do showFullAddress success")
     } catch (error) {
       console.error(error)
@@ -76,7 +76,7 @@ function Utility({ appPrivateKey, appPublicKey, appId, transport }) {
       dataArr.push({ balance: -2345.3, coinType: "90" })
       const lastKeyIdArr = await apdu.mcu.display.updateBalance(transport, appId, appPrivateKey, dataArr);
       console.log(lastKeyIdArr)
-      setLastKeyIdArray(lastKeyIdArr)
+      // setLastKeyIdArray(lastKeyIdArr)
     } catch (error) {
       console.error(error)
     } finally {
