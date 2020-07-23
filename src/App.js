@@ -2,7 +2,7 @@ import React from "react";
 import { HashRouter as Router } from "react-router-dom";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import WebBleTransport from "@coolwallet/transport-web-ble";
-
+import { apdu } from "@coolwallet/core";
 import { getAppKeysOrGenerate, getAppIdOrNull } from "./Utils/sdkUtil";
 import Routes from "./Components/Routes";
 import MyNavBar from "./Components/NavBar";
@@ -60,6 +60,25 @@ class App extends React.Component {
       );
   }
 
+  cancelAPDU = () => {
+    apdu.mcu.control.cancelAPDU(this.state.transport);
+    alert("cancel action success!!!");
+  };
+
+  cancelButton() {
+
+    return (
+      <Button
+        variant="outline-warning"
+        style={{ margin: 5 }}
+        onClick={this.cancelAPDU}
+      >
+        cancel action
+      </Button>
+    )
+      
+  };
+
   showErrorMessage() {
     return this.state.errorMsg ? (
       <Row style={{ margin: 25, background: "white" }}>
@@ -86,6 +105,7 @@ class App extends React.Component {
                 {this.state.cardName}
               </p>
               {this.showConnectButton()}
+              {this.cancelButton()}
             </Row>
             {this.showErrorMessage()}
           </Container>

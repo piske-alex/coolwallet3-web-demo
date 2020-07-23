@@ -1,4 +1,4 @@
-import { wallet } from '@coolwallet/core'
+import { crypto } from '@coolwallet/core'
 
 export const getAppKeysOrGenerate = () => {
   let appPublicKey = localStorage.getItem('appPublicKey')
@@ -9,7 +9,7 @@ export const getAppKeysOrGenerate = () => {
   }
 
   // Generate new keyPair
-  const keyPair = wallet.generateKeyPair()
+  const keyPair = crypto.generateKeyPair()
   localStorage.setItem('appPublicKey', keyPair.publicKey)
   localStorage.setItem('appPrivateKey', keyPair.privateKey)
   return { appPublicKey: keyPair.publicKey, appPrivateKey: keyPair.privateKey }
