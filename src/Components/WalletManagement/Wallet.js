@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { InputGroup, FormControl, Button, Row, Container, Col } from 'react-bootstrap';
+import { apdu } from '@coolwallet/core';
 
-function Wallet({ wallet, transport }) {
+function Wallet({ appId, appPublicKey, appPrivateKey, transport }) {
 
   const [isSettingSeedByCreate, setIsSettingSeedByCreate] = useState(false);
   const [isSettingSeedByRecover, setIsSettingSeedByRecover] = useState(false);
@@ -33,7 +34,7 @@ function Wallet({ wallet, transport }) {
     console.log(`${method} setting seed: ${mnemonic}`);
     console.log(mnemonic)
     try {
-      await wallet.setSeed(mnemonic)
+      await apdu.wallet.setSeed(transport, appId, appPrivateKey, mnemonic)
     } catch(error){
       console.error(error)
     } finally {
@@ -44,7 +45,7 @@ function Wallet({ wallet, transport }) {
 
   const createWallet = async() => {
     try {
-      await wallet.createSeedByCard(12);
+      await apdu.wallet.createSeedByCard(transport, appId, appPrivateKey, 12);
     } catch (error) {
       console.error(error)
     }
@@ -53,7 +54,7 @@ function Wallet({ wallet, transport }) {
   const createSeedByApp = async () => {
 
     const crypto = require('crypto');
-    const seedStrPromise = wallet.createSeedByApp(12, crypto.randomBytes)
+    const seedStrPromise = apdu.util.createSeedByApp(12, crypto.randomBytes)
     
     seedStrPromise.then(function (result) {
         setCreateMnemonic(result)
@@ -67,7 +68,7 @@ function Wallet({ wallet, transport }) {
     setIsCheckingSum(true)
     const sum = parseInt(sumOfSeed);
     try {
-      await wallet.sendCheckSum(sum)
+      await apdu.wallet.sendCheckSum(transport, sum)
     } catch(error) {
       console.error(error)
     } finally {
@@ -78,7 +79,7 @@ function Wallet({ wallet, transport }) {
   const initSecureRecovery = async () => {
     let num = 12;
     try {
-      const status = await wallet.initSecureRecovery(num)
+      const status = await apdu.wallet.initSecureRecovery(transport, num)
       console.log(`initSecureRecovery status : ${status}`)
     } catch (error) {
       console.error(error)
@@ -91,13 +92,13 @@ function Wallet({ wallet, transport }) {
     console.log(numOfSettingIndex)
 
     try {
-      const status = await wallet.setSecureRecveryIdx(recoverIndex)
+      const status = await apdu.wallet.setSecureRecoveryIdx(transport, recoverIndex)
       console.log(`setSecureRecveryIdx status : ${status}`)
       if (numOfSettingIndex >= 5){
         alert(`check your card!!!`)
 
         try {
-          console.log(await wallet.getSecureRecoveryStatus())
+          console.log(await apdu.wallet.getSecureRecoveryStatus(transport))
         } catch (error) {
           console.log(error)
         }
@@ -136,7 +137,7 @@ function Wallet({ wallet, transport }) {
     const cancelType = event.target.getAttribute('cancel-type')
     console.log(cancelType)
     try{
-      await wallet.cancelSecureRecovery(cancelType)
+      await apdu.wallet.cancelSecureRecovery(transport, cancelType)
       setNumOfSettingIndex(1)
     } catch (error) {
       console.error(error)
