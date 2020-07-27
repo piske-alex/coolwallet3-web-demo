@@ -21,6 +21,11 @@ function MyNavBar() {
           </Nav.Link>
         </Nav.Item>
         <Nav.Item>
+          <Nav.Link className="NavItem" href="#utility">
+            Utility
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
           <Nav.Link className="NavItem" href="#eth">
             ETH
           </Nav.Link>
