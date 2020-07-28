@@ -14,7 +14,7 @@ import axios from "axios";
 // import * as API from "./api";
 
 function XRPTest({ transport, appPrivateKey, appId }) {
-  const XRP = new cwsXRP(transport, appPrivateKey, appId);
+  const XRP = new cwsXRP();
 
   const [addressIndex, setAddressIndex] = useState(0);
   const [balance, setBalance] = useState(0);
@@ -32,7 +32,7 @@ function XRPTest({ transport, appPrivateKey, appId }) {
     setIsGettingAddress(true);
     const addressIdx = parseInt(addressIndex);
     try {
-      const address = await XRP.getAddress(addressIdx); //.then((address) => {
+      const address = await XRP.getAddress(transport, appPrivateKey, appId, addressIdx); //.then((address) => {
       setAddress(address);
       axios
         .get(`https://data.ripple.com/v2/accounts/${address}/balances`)
@@ -66,7 +66,7 @@ function XRPTest({ transport, appPrivateKey, appId }) {
         Destination: "rB8rz3nCuHDviKErGMT8xuFHZ8ZvdMfF91",
       };
 
-      const signedTx = await XRP.signTransaction(param, addressIndex); //.then((signedTx) => {
+      const signedTx = await XRP.signTransaction(transport, appPrivateKey, appId, param, addressIndex); //.then((signedTx) => {
       console.log("signedTx: " + signedTx);
     } catch (error) {
       console.error(error);
