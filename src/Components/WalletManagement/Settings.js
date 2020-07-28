@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Container, InputGroup, FormControl, Row, Col, Button } from 'react-bootstrap';
 import { error as Error, apdu } from '@coolwallet/core';
 
-function SettingPage({ wallet, appId, appPublicKey, appPrivateKey, transport }) {
+function SettingPage({ appId, appPublicKey, appPrivateKey, transport }) {
   const [password, setPassword] = useState('12345678');
   const [deviceName, setDeviceName] = useState('Click Get Paired APP');
   const [newPassword, setNewPassword] = useState('')
@@ -27,7 +27,7 @@ function SettingPage({ wallet, appId, appPublicKey, appPrivateKey, transport }) 
   const getPassword = async () => {
     setIsRevokingPassword(true)
     try {
-      const newPassword = await wallet.getPairingPassword(); //.then((pwd) => {
+      const newPassword = await apdu.pair.getPairingPassword(transport, appId, appPrivateKey); //.then((pwd) => {
       setNewPassword(newPassword)
     } catch (error) {
       console.error(error)
@@ -40,10 +40,9 @@ function SettingPage({ wallet, appId, appPublicKey, appPrivateKey, transport }) 
     try {
       setIsRegistering(true)
       const name = 'TestAPP'
-      const appId = await wallet.register(appPublicKey, password, name);
+      const appId = await apdu.pair.register(transport, appPublicKey, password, name);
       setDeviceName(name)
       localStorage.setItem('appId', appId);
-      wallet.setAppId(appId);
     } catch (error) {
       // TODO
       if (error instanceof Error.AlreadyRegistered) {
@@ -59,7 +58,7 @@ function SettingPage({ wallet, appId, appPublicKey, appPrivateKey, transport }) 
   const resetCard = async () => {
     setIsResetting(true)
     try {
-      await wallet.resetCard();
+      await apdu.general.resetCard(transport);
     } catch (error) {
       console.error(error)
     } finally {
@@ -71,7 +70,7 @@ function SettingPage({ wallet, appId, appPublicKey, appPrivateKey, transport }) 
   const getCardInfo = async () => {
     isSettingCardInfo(true)
     try {
-      const data = await wallet.getCardInfo();
+      const data = await apdu.info.getCardInfo(transport);
       const cardInfo = `paired: ${data.paired}, locked: ${data.locked}, walletCreated: ${data.walletCreated},showDetail: ${data.showDetail}, pairRemainTimes: ${data.pairRemainTimes}`;
       setCardInfo(cardInfo)
     } catch (error) {
@@ -112,7 +111,7 @@ function SettingPage({ wallet, appId, appPublicKey, appPrivateKey, transport }) 
   const getPairedApps = async () => {
     isSettingPairedAPPs(true)
     try {
-      const data = await wallet.getPairedApps()
+      const data = await apdu.pair.getPairedApps(transport, appId, appPrivateKey)
       let dataStr = ''
       for (let index = 0; index < data.length; index++) {
         const pairedAppId = data[index].appId;
@@ -291,7 +290,7 @@ function SettingPage({ wallet, appId, appPublicKey, appPrivateKey, transport }) 
               removePairedDevice(pairedAPPID);
             }}
           >
-            {isRemovePairedDevice ? 'Loading' : 'Remove Paired Device'}
+            {isRemovePairedDevice ? 'Please Press Button...' : 'Remove Paired Device'}
           </Button>
         </Col>
         <Col>
