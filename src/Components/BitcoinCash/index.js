@@ -9,13 +9,13 @@ let BCH;
 let ScriptType;
 let redeemScriptType;
 
-function BitcoinTest({ transport, appPrivateKey, appId }) {
+function BitcoinCashTest({ transport, appPrivateKey, appId }) {
 	if (!BCH && transport && appPrivateKey && appId) {
 		console.log('transport :', transport);
 		console.log('appPrivateKey :', appPrivateKey);
 		console.log('appId :', appId);
 
-		BCH = new cwsBCH(transport, appPrivateKey, appId);
+		BCH = new cwsBCH();
 		redeemScriptType = BCH.ScriptType.P2SH_P2WPKH;
 		ScriptType = BCH.ScriptType;
 		updateAccounts(10);
@@ -38,7 +38,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 			const addresses = [];
 			const outScripts = [];
 			for (let index = 0; index < maxAddrIndex; index++) {
-				const { address, outScript } = await BCH.getAddressAndOutScript(index);
+				const { address, outScript } = await BCH.getAddressAndOutScript(transport, appPrivateKey, appId, index);
 				addresses.push(address);
 				outScripts.push(outScript.toString('hex'));
 			}
@@ -110,14 +110,14 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 				address: toAddress,
 			};
 			console.log('output :', output);
-			const outputScriptType = BCH.addressToOutScript(toAddress).scriptType;
+			const outputScriptType = BCH.addressToOutScript(transport, appPrivateKey, appId, toAddress).scriptType;
 
 			const { inputs, change, fee } = coinSelect(utxos, redeemScriptType, output, outputScriptType, changeAddressIndex, feeRate, ScriptType);
 			console.log('inputs :', inputs);
 			console.log('change :', change);
 			console.log('fee :', fee);
 
-			const transaction = await BCH.signTransaction(redeemScriptType, inputs, output, change);
+			const transaction = await BCH.signTransaction(transport, appPrivateKey, appId, redeemScriptType, inputs, output, change);
 			console.log('transaction :', transaction);
 
 			setTx(transaction);
@@ -267,4 +267,4 @@ function showAccount(disabled, itemKey, addressIndex, accounts, name, onIndexCha
 	);
 }
 
-export default BitcoinTest;
+export default BitcoinCashTest;

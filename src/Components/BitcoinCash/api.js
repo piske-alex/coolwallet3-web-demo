@@ -7,20 +7,13 @@ export const getFeeRate = async () => {
 };
 
 export const getBalances = async addresses => {
+	console.log(addresses)
 	try {
 		let balances = [];
-		const addressLimit = 50;
-		const c = Math.ceil(addresses.length / addressLimit);
-		for (let i = 0; i < c; i++) {
-			const n = i * addressLimit;
-			const addrs = addresses.slice(n, n + addressLimit);
-			const addressesWithPipe = addrs.join('|');
-			const res = await fetch(`https://blockchain.info/multiaddr?active=${addressesWithPipe}&n=0&cors=true`);
+		for (let address of addresses) {
+			const res = await fetch(`https://route.cbx.io/api/bch/addr/${address}`);
 			const resObject = await res.json();
-
-			balances = balances.concat(resObject.addresses.map(addr => {
-				return (new BigNumber(addr.final_balance)).shiftedBy(-8).toFixed();
-			}));
+			balances = balances.concat(new BigNumber(resObject.balance).toFixed());
 		}
 		return balances;
 	} catch (error) {
@@ -36,18 +29,18 @@ export const getUtxos = async (addresses, outScripts) => {
 		for (let i = 0; i < c; i++) {
 			const n = i * addressLimit;
 			const addrs = addresses.slice(n, n + addressLimit);
-			const addressesWithPipe = addrs.join('|');
-			const res = await fetch(`https://blockchain.info/unspent?active=${addressesWithPipe}&cors=true`);
+			const addressesWithComma = addrs.join(',');
+			const res = await fetch(`https://route.cbx.io/api/bch/addrs/${addressesWithComma}/utxo`);
 			const resObject = await res.json();
 			console.log('resObject :', resObject);
 
 			const scripts = outScripts.slice(n, n + addressLimit);
 
-			for (const out of resObject.unspent_outputs) {
-				const preTxHash = out.tx_hash_big_endian;
-				const preIndex = out.tx_output_n;
-				const preValue = (new BigNumber(out.value_hex, 16)).toFixed();
-				const addressIndex = scripts.indexOf(out.script);
+			for (const utxo of resObject) {
+				const preTxHash = utxo.txid;
+				const preIndex = utxo.vout;
+				const preValue = (new BigNumber(utxo.satoshis, 16)).toFixed();
+				const addressIndex = scripts.indexOf(utxo.scriptPubKey.slice(2));
 
 				if (!utxos[addressIndex]) utxos[addressIndex] = [];
 				utxos[addressIndex].push({ preTxHash, preIndex, preValue, addressIndex });
