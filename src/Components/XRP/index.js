@@ -11,7 +11,7 @@ import {
 } from "react-bootstrap";
 import cwsXRP from "@coolwallet/xrp";
 import axios from "axios";
-import * as API from "./api";
+// import * as API from "./api";
 
 function XRPTest({ transport, appPrivateKey, appId }) {
   const XRP = new cwsXRP(transport, appPrivateKey, appId);

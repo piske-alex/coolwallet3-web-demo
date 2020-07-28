@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { InputGroup, FormControl, Button, Row, Container, Col } from 'react-bootstrap';
-const bip39 = require('bip39');
 
 function Wallet({ wallet, transport }) {
 
@@ -32,7 +31,6 @@ function Wallet({ wallet, transport }) {
         return
     }
     console.log(`${method} setting seed: ${mnemonic}`);
-    const hex = bip39.mnemonicToSeedSync(mnemonic).toString('hex'); // ''
     console.log(mnemonic)
     try {
       await wallet.setSeed(mnemonic)
