@@ -40,8 +40,7 @@ export const getUtxos = async (addresses, outScripts) => {
 				const preTxHash = utxo.txid;
 				const preIndex = utxo.vout;
 				const preValue = (new BigNumber(utxo.satoshis, 16)).toFixed();
-				const addressIndex = scripts.indexOf(utxo.scriptPubKey.slice(2));
-
+				const addressIndex = scripts.indexOf(utxo.scriptPubKey);
 				if (!utxos[addressIndex]) utxos[addressIndex] = [];
 				utxos[addressIndex].push({ preTxHash, preIndex, preValue, addressIndex });
 			}

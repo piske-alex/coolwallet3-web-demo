@@ -16,7 +16,7 @@ function BitcoinCashTest({ transport, appPrivateKey, appId }) {
 		console.log('appId :', appId);
 
 		BCH = new cwsBCH();
-		redeemScriptType = BCH.ScriptType.P2SH_P2WPKH;
+		redeemScriptType = BCH.ScriptType.P2SH;
 		ScriptType = BCH.ScriptType;
 		updateAccounts(10);
 	}
@@ -110,7 +110,8 @@ function BitcoinCashTest({ transport, appPrivateKey, appId }) {
 				address: toAddress,
 			};
 			console.log('output :', output);
-			const outputScriptType = BCH.addressToOutScript(transport, appPrivateKey, appId, toAddress).scriptType;
+			console.log("toAddress: " + typeof (toAddress))
+			const outputScriptType = BCH.addressToOutScript(toAddress).scriptType;
 
 			const { inputs, change, fee } = coinSelect(utxos, redeemScriptType, output, outputScriptType, changeAddressIndex, feeRate, ScriptType);
 			console.log('inputs :', inputs);

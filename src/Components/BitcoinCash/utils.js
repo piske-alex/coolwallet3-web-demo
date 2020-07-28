@@ -23,32 +23,18 @@ export function coinSelect(utxos, inputScriptType, output, outputScriptType, cha
 	let inScriptBytes;
 	let changeScriptBytes;
 	let changeDustThreshold;
-	if (inputScriptType === ScriptType.P2PKH) {
-		inScriptBytes = TxBytes.P2PKH_IN_SCRIPT;
-		changeScriptBytes = TxBytes.P2PKH_OUT_SCRIPT;
-		changeDustThreshold = TxBytes.P2PKH_DUST_THRESHOLD;
-	} else if (inputScriptType === ScriptType.P2SH_P2WPKH) {
+	if (inputScriptType === ScriptType.P2PKH || inputScriptType === ScriptType.P2SH) {
 		inScriptBytes = TxBytes.P2SH_P2WPKH_IN_SCRIPT;
 		changeScriptBytes = TxBytes.P2SH_P2WPKH_OUT_SCRIPT;
 		changeDustThreshold = TxBytes.P2SH_P2WPKH_DUST_THRESHOLD;
-	} else if (inputScriptType === ScriptType.P2WPKH) {
-		inScriptBytes = TxBytes.P2WPKH_IN_SCRIPT;
-		changeScriptBytes = TxBytes.P2WPKH_OUT_SCRIPT;
-		changeDustThreshold = TxBytes.P2WPKH_DUST_THRESHOLD;
 	} else {
 		throw new Error('no inputScriptType parameter');
 	}
 	let outScriptBytes;
 	let outDustThreshold;
-	if (outputScriptType === ScriptType.P2PKH) {
-		outScriptBytes = TxBytes.P2PKH_OUT_SCRIPT;
-		outDustThreshold = TxBytes.P2PKH_DUST_THRESHOLD;
-	} else if (outputScriptType === ScriptType.P2SH_P2WPKH) {
+	if (inputScriptType === ScriptType.P2PKH || inputScriptType === ScriptType.P2SH) {
 		outScriptBytes = TxBytes.P2SH_P2WPKH_OUT_SCRIPT;
 		outDustThreshold = TxBytes.P2SH_P2WPKH_DUST_THRESHOLD;
-	} else if (outputScriptType === ScriptType.P2WPKH) {
-		outScriptBytes = TxBytes.P2WPKH_OUT_SCRIPT;
-		outDustThreshold = TxBytes.P2WPKH_DUST_THRESHOLD;
 	} else {
 		throw new Error('no outputScriptType parameter');
 	}
@@ -65,6 +51,7 @@ export function coinSelect(utxos, inputScriptType, output, outputScriptType, cha
 	console.log('fee :', fee);
 	let inAccum = 0;
 	let inputs = [];
+	console.log("sortedUtxos: " + sortedUtxos)
 
 	for (let i = 0; i < sortedUtxos.length; i++) {
 		const utxo = sortedUtxos[i];
