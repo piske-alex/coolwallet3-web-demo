@@ -15,7 +15,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 		console.log('appPrivateKey :', appPrivateKey);
 		console.log('appId :', appId);
 
-		BTC = new cwsBTC(transport, appPrivateKey, appId);
+		BTC = new cwsBTC();
 		redeemScriptType = BTC.ScriptType.P2SH_P2WPKH;
 		ScriptType = BTC.ScriptType;
 		updateAccounts(10);
@@ -38,7 +38,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 			const addresses = [];
 			const outScripts = [];
 			for (let index = 0; index < maxAddrIndex; index++) {
-				const { address, outScript } = await BTC.getAddressAndOutScript(redeemScriptType, index);
+				const { address, outScript } = await BTC.getAddressAndOutScript(transport, appPrivateKey, appId, redeemScriptType, index);
 				addresses.push(address);
 				outScripts.push(outScript.toString('hex'));
 			}
@@ -110,14 +110,14 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 				address: toAddress,
 			};
 			console.log('output :', output);
-			const outputScriptType = BTC.addressToOutScript(toAddress).scriptType;
+			const outputScriptType = BTC.addressToOutScript(transport, appPrivateKey, appId, toAddress).scriptType;
 
 			const { inputs, change, fee } = coinSelect(utxos, redeemScriptType, output, outputScriptType, changeAddressIndex, feeRate, ScriptType);
 			console.log('inputs :', inputs);
 			console.log('change :', change);
 			console.log('fee :', fee);
 
-			const transaction = await BTC.signTransaction(redeemScriptType, inputs, output, change);
+			const transaction = await BTC.signTransaction(transport, appPrivateKey, appId, redeemScriptType, inputs, output, change);
 			console.log('transaction :', transaction);
 
 			setTx(transaction);
