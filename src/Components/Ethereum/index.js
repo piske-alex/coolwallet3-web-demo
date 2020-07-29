@@ -19,7 +19,7 @@ const web3 = new Web3(
 );
 
 function EthTest({ transport, appPrivateKey, appId }) {
-  const ETH = new cwsETH(transport, appPrivateKey, appId);
+  const ETH = new cwsETH();
 
   const [addressIndex, setAddressIndex] = useState(0);
   const [gasPrice, setGasPrice] = useState(10);
@@ -45,7 +45,8 @@ function EthTest({ transport, appPrivateKey, appId }) {
     setIsGettingAddress(true);
     const addressIdx = parseInt(addressIndex);
     try {
-      const address = await ETH.getAddress(addressIdx); //.then((address) => {
+      console.log(transport)
+      const address = await ETH.getAddress(transport, appPrivateKey, appId, addressIdx); //.then((address) => {
       setAddress(address);
       web3.eth.getBalance(address, "pending", (err, balance) => {
         setBalance(web3.utils.fromWei(balance));
@@ -94,7 +95,7 @@ function EthTest({ transport, appPrivateKey, appId }) {
         //   decimals: 18,
         // },
       };
-      const signedTx = await ETH.signTransaction(param, addressIndex); //.then((signedTx) => {
+      const signedTx = await ETH.signTransaction(transport, appPrivateKey, appId, param, addressIndex); //.then((signedTx) => {
       console.log("Signature: " + signedTx)
       /*web3.eth.sendSignedTransaction(signedTx, (err, txHash) => {
         if (err) {
@@ -197,7 +198,6 @@ function EthTest({ transport, appPrivateKey, appId }) {
                   value={data}
                   onChange={(event) => {
                     setData(event.target.value);
-                    // this.setState({ data:  })
                   }}
                   placeholder="0x..."
                 />

@@ -10,4 +10,4 @@ npm link @coolwallet/btc
 #npm link @coolwallet/icx
 #npm link @coolwallet/xlm
 
-npm install
+# npm install
