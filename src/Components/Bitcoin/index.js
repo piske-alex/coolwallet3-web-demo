@@ -110,7 +110,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 				address: toAddress,
 			};
 			console.log('output :', output);
-			const outputScriptType = BTC.addressToOutScript(transport, appPrivateKey, appId, toAddress).scriptType;
+			const outputScriptType = BTC.addressToOutScript(toAddress).scriptType;
 
 			const { inputs, change, fee } = coinSelect(utxos, redeemScriptType, output, outputScriptType, changeAddressIndex, feeRate, ScriptType);
 			console.log('inputs :', inputs);
