@@ -11,4 +11,4 @@ npm link @coolwallet/bch
 #npm link @coolwallet/icx
 #npm link @coolwallet/xlm
 
-npm install
+# npm install

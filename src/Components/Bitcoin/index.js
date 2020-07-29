@@ -10,6 +10,7 @@ let redeemScriptType;
 let ScriptType
 
 function BitcoinTest({ transport, appPrivateKey, appId }) {
+	console.log(transport)
 	if (!BTC && transport && appPrivateKey && appId) {
 		console.log('transport :', transport);
 		console.log('appPrivateKey :', appPrivateKey);
