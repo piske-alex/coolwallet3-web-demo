@@ -5,11 +5,12 @@ import Utility from "./Utility";
 import ETHTest from "./Ethereum";
 import XRPTest from "./XRP";
 import BitcoinTest from "./Bitcoin";
+import BitcoinCashTest from "./BitcoinCash";
 
 function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
   return (
     <Switch>
-      <Redirect from='/' to='/wallet'/>
+      <Redirect from='/' to='/wallet' />
       <Route
         path="/wallet/"
         children={
@@ -58,6 +59,16 @@ function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
         path="/btc"
         children={
           <BitcoinTest
+            transport={transport}
+            appPrivateKey={appPrivateKey}
+            appId={appId}
+          />
+        }
+      />
+      <Route
+        path="/bch"
+        children={
+          <BitcoinCashTest
             transport={transport}
             appPrivateKey={appPrivateKey}
             appId={appId}

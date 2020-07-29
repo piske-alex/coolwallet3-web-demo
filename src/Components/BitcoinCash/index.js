@@ -1,28 +1,27 @@
 import BigNumber from 'bignumber.js';
 import React, { useState } from 'react';
 import { Container, Button, Row, Col, InputGroup, FormControl, ListGroup, DropdownButton, Dropdown } from 'react-bootstrap';
-import cwsBTC from '@coolwallet/btc';
+import cwsBCH from '@coolwallet/bch';
 import { getFeeRate, getBalances, getUtxos, sendTx } from './api';
 import { coinSelect } from './utils';
 
-let BTC;
+let BCH;
+let ScriptType;
 let redeemScriptType;
-let ScriptType
 
-function BitcoinTest({ transport, appPrivateKey, appId }) {
-	console.log(transport)
-	if (!BTC && transport && appPrivateKey && appId) {
+function BitcoinCashTest({ transport, appPrivateKey, appId }) {
+	if (!BCH && transport && appPrivateKey && appId) {
 		console.log('transport :', transport);
 		console.log('appPrivateKey :', appPrivateKey);
 		console.log('appId :', appId);
 
-		BTC = new cwsBTC();
-		redeemScriptType = BTC.ScriptType.P2SH_P2WPKH;
-		ScriptType = BTC.ScriptType;
+		BCH = new cwsBCH();
+		redeemScriptType = BCH.ScriptType.P2SH;
+		ScriptType = BCH.ScriptType;
 		updateAccounts(10);
 	}
 
-	const disabled = !BTC;
+	const disabled = !BCH;
 
 	const [accounts, setAccounts] = useState([{ address: '', balance: '', utxos: [] }]);
 	const [fromAddressIndices, setFromAddressIndices] = useState([0]);
@@ -39,7 +38,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 			const addresses = [];
 			const outScripts = [];
 			for (let index = 0; index < maxAddrIndex; index++) {
-				const { address, outScript } = await BTC.getAddressAndOutScript(transport, appPrivateKey, appId, redeemScriptType, index);
+				const { address, outScript } = await BCH.getAddressAndOutScript(transport, appPrivateKey, appId, index);
 				addresses.push(address);
 				outScripts.push(outScript.toString('hex'));
 			}
@@ -111,14 +110,15 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 				address: toAddress,
 			};
 			console.log('output :', output);
-			const outputScriptType = BTC.addressToOutScript(toAddress).scriptType;
+			console.log("toAddress: " + typeof (toAddress))
+			const outputScriptType = BCH.addressToOutScript(toAddress).scriptType;
 
 			const { inputs, change, fee } = coinSelect(utxos, redeemScriptType, output, outputScriptType, changeAddressIndex, feeRate, ScriptType);
 			console.log('inputs :', inputs);
 			console.log('change :', change);
 			console.log('fee :', fee);
 
-			const transaction = await BTC.signTransaction(transport, appPrivateKey, appId, redeemScriptType, inputs, output, change);
+			const transaction = await BCH.signTransaction(transport, appPrivateKey, appId, redeemScriptType, inputs, output, change);
 			console.log('transaction :', transaction);
 
 			setTx(transaction);
@@ -268,4 +268,4 @@ function showAccount(disabled, itemKey, addressIndex, accounts, name, onIndexCha
 	);
 }
 
-export default BitcoinTest;
+export default BitcoinCashTest;

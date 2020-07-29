@@ -40,6 +40,11 @@ function MyNavBar() {
             XRP
           </Nav.Link>
         </Nav.Item>
+        <Nav.Item>
+          <Nav.Link className="NavItem" href="#bch">
+            BCH
+          </Nav.Link>
+        </Nav.Item>
       </Nav>
     </Navbar>
   );
