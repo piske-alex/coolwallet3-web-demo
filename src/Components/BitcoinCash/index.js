@@ -16,7 +16,7 @@ function BitcoinCashTest({ transport, appPrivateKey, appId }) {
 		console.log('appId :', appId);
 
 		BCH = new cwsBCH();
-		redeemScriptType = BCH.ScriptType.P2SH;
+		redeemScriptType = BCH.ScriptType.P2PKH;
 		ScriptType = BCH.ScriptType;
 		updateAccounts(10);
 	}

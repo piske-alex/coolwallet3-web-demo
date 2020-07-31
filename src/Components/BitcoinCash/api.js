@@ -53,12 +53,12 @@ export const getUtxos = async (addresses, outScripts) => {
 
 export const sendTx = async (tx) => {
 	try {
-		const response = await fetch(`https://blockchain.info/pushtx?cors=true`, {
+		const response = await fetch(`https://route.cbx.io/api/bch/tx/send`, {
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
 			},
 			method: 'POST',
-			body: `tx=${tx}`,
+			body: `rawTx=${tx}`,
 		});
 		return await response.text();
 
