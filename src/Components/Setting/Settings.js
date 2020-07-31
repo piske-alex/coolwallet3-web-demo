@@ -12,6 +12,7 @@ function SettingPage({ appId, appPublicKey, appPrivateKey, transport }) {
   const [pairedAPPs, setPairedAPPs] = useState()
   const [pairedAPPID, setPairedAPPID] = useState()
   const [newDeviceName, setNewDeviceName] = useState('')
+  const [AppletExist, setAppletExist] = useState('')
 
   const [isRevokingPassword, setIsRevokingPassword] = useState(false)
   const [isResetting, setIsResetting] = useState(false)
@@ -23,6 +24,7 @@ function SettingPage({ appId, appPublicKey, appPrivateKey, transport }) {
   const [isRemovePairedDevice, setRemovePairedDevice] = useState(false)
   const [isSwitchLockStatus, setSwitchLockStatus] = useState(false)
   const [isRenameDevice, setRenameDevice] = useState(false)
+  const [isAppletExist, setIsAppletExist] = useState(false)
 
   const getPassword = async () => {
     setIsRevokingPassword(true)
@@ -166,6 +168,18 @@ function SettingPage({ appId, appPublicKey, appPrivateKey, transport }) {
       console.error(error)
     } finally {
       setRenameDevice(false)
+    }
+  }
+
+  const getApplet = async () => {
+    setIsAppletExist(true)
+    try {
+      const result = await apdu.ota.selectApplet(transport);
+      setAppletExist(`===>${result}`)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsAppletExist(false)
     }
   }
 
@@ -340,6 +354,20 @@ function SettingPage({ appId, appPublicKey, appPrivateKey, transport }) {
               placeholder='New Device Name'
             />
           </InputGroup>
+        </Col>
+      </Row>
+      <Row>
+        <Col xs={3}>
+          <Button
+            disabled={isAppletExist}
+            variant='outline-light'
+            style={{ margin: 5 }}
+            onClick={getApplet}>
+            {isAppletExist ? 'Loading' : 'Is Applet Exist'}
+          </Button>
+        </Col>
+        <Col cs={3}>
+          {AppletExist}
         </Col>
       </Row>
     </Container>
