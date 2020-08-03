@@ -1,13 +1,12 @@
 import BigNumber from 'bignumber.js';
 
 export const getFeeRate = async () => {
-	const res = await fetch(`https://bitcoinfees.earn.com/api/v1/fees/recommended`);
+	const res = await fetch(`https://route.cbx.io/api/bch/utils/estimatefee`);
 	const resObject = await res.json();
-	return resObject.fastestFee;
+	return (new BigNumber(resObject[3])).shiftedBy(5).toFixed();
 };
 
 export const getBalances = async addresses => {
-	console.log(addresses)
 	try {
 		let balances = [];
 		for (let address of addresses) {
@@ -39,7 +38,7 @@ export const getUtxos = async (addresses, outScripts) => {
 			for (const utxo of resObject) {
 				const preTxHash = utxo.txid;
 				const preIndex = utxo.vout;
-				const preValue = (new BigNumber(utxo.satoshis, 16)).toFixed();
+				const preValue = (new BigNumber(utxo.satoshis)).toFixed();
 				const addressIndex = scripts.indexOf(utxo.scriptPubKey);
 				if (!utxos[addressIndex]) utxos[addressIndex] = [];
 				utxos[addressIndex].push({ preTxHash, preIndex, preValue, addressIndex });
@@ -54,12 +53,12 @@ export const getUtxos = async (addresses, outScripts) => {
 
 export const sendTx = async (tx) => {
 	try {
-		const response = await fetch(`https://blockchain.info/pushtx?cors=true`, {
+		const response = await fetch(`https://route.cbx.io/api/bch/tx/send`, {
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
 			},
 			method: 'POST',
-			body: `tx=${tx}`,
+			body: `rawTx=${tx}`,
 		});
 		return await response.text();
 
