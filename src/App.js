@@ -1,83 +1,124 @@
-import React from 'react'
-import './App.css'
-import Container from 'react-bootstrap/Container'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
+import React from "react";
+import { HashRouter as Router } from "react-router-dom";
+import { Container, Row, Col, Button } from "react-bootstrap";
+import WebBleTransport from "@coolwallet/transport-web-ble";
+import { apdu } from "@coolwallet/core";
+import { getAppKeysOrGenerate, getAppIdOrNull } from "./Utils/sdkUtil";
+import Routes from "./Components/Routes";
+import MyNavBar from "./Components/NavBar";
+import "./App.css";
 
-import Connection from './Components/Connection'
-import Settings from './Components/Settings'
-import WalletTest from './Components/WalletTests'
-import CoinTest from './Components/CoinTest'
+const { appPublicKey, appPrivateKey } = getAppKeysOrGenerate();
+const appId = getAppIdOrNull();
 
-import CoolWallet from '@coolwallets/wallet'
-import cwsBNB from '@coolwallets/bnb'
-import WebBleTransport from '@coolwallets/transport-web-ble';
-import { getAppKeysOrGenerate, getAppIdOrNull } from './Utils/sdkUtil'
-
-const { appPublicKey, appPrivateKey } = getAppKeysOrGenerate()
-const appId = getAppIdOrNull()
-
-export default class App extends React.Component {
+class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      transport: {}
-    }
+    this.state = { transport: undefined, cardName: "", errorMsg: "" };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { errorMsg: error.toString() };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.debug("catched error :", error);
   }
 
   connect = async () => {
     WebBleTransport.listen(async (error, device) => {
+      console.log(device)
       if (device) {
+        const cardName = device.name;
         const transport = await WebBleTransport.connect(device);
-        this.setState({
-          transport
-        });
-        return transport;
+        this.setState({ transport, cardName });
+      } else {
+        console.log(error);
       }
-      throw error;
     });
-  }
+  };
 
   disconnect = () => {
-    const { transport } = this.state;
-    WebBleTransport.disconnect(transport.device.id);
-    this.setState({
-      transport: {}
-    });
+    WebBleTransport.disconnect(this.state.transport.device.id);
+    this.setState({ transport: undefined, cardName: "" });
+  };
+
+  showConnectButton() {
+    return this.state.cardName ? (
+      <Button
+        variant="outline-warning"
+        style={{ margin: 5 }}
+        onClick={this.disconnect}
+      >
+        {" "}
+        Disconnect
+      </Button>
+    ) : (
+        <Button variant="light" style={{ margin: 5 }} onClick={this.connect}>
+          Connect
+        </Button>
+      );
+  }
+
+  cancelAPDU = () => {
+    apdu.mcu.control.cancelAPDU(this.state.transport);
+    alert("cancel action success!!!");
+  };
+
+  cancelButton() {
+
+    return (
+      <Button
+        variant="outline-warning"
+        style={{ margin: 5 }}
+        onClick={this.cancelAPDU}
+      >
+        cancel action
+      </Button>
+    )
+
+  };
+
+  showErrorMessage() {
+    return this.state.errorMsg ? (
+      <Row style={{ margin: 25, background: "white" }}>
+        <div style={{ width: "4px", background: "red" }} />
+        <Col style={{ paddingTop: 15 }}>
+          <p style={{ fontSize: 15, color: "red" }}>{this.state.errorMsg}</p>
+        </Col>
+      </Row>
+    ) : (
+        <Row style={{ margin: 25 }} />
+      );
   }
 
   render() {
-    const { transport } = this.state;
-    const wallet = new CoolWallet(transport, appPrivateKey, appId);
-    const BNB = new cwsBNB(transport, appPrivateKey, appId)
     return (
-      <div className='App'>
-        <header className='App-header'>
+      <div className="App">
+        <Router>
           <Container>
-            <h3 style={{ padding: 20 }}> CoolWalletS x Web BLE </h3>
+            <Row>
+              <Col>
+                <MyNavBar />
+              </Col>
+              <p style={{ paddingTop: 15, paddingRight: 10 }}>
+                {this.state.cardName}
+              </p>
+              {this.showConnectButton()}
+              {this.cancelButton()}
+            </Row>
+            {this.showErrorMessage()}
           </Container>
-          <Container>
-            <Row style={{ margin: 20 }}>
-              <Col>
-                <Connection connect={this.connect} disconnect={this.disconnect}></Connection>
-              </Col>
-              <Col>
-                <Settings wallet={wallet} appPublicKey={appPublicKey}></Settings>
-              </Col>
-            </Row>
-            <Row style={{ margin: 20 }}>
-              <Col>
-                <WalletTest wallet={wallet}></WalletTest>
-              </Col>
-            </Row>
-            <Row style={{ margin: 20 }}>
-              <Col>
-                <CoinTest Coin={BNB}></CoinTest>
-              </Col>
-            </Row>
-          </Container>
-        </header>
+          <Routes
+            transport={this.state.transport}
+            appId={appId}
+            appPrivateKey={appPrivateKey}
+            appPublicKey={appPublicKey}
+          />
+        </Router>
       </div>
-    )
+    );
   }
 }
+
+export default App;
