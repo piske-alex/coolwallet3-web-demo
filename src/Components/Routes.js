@@ -3,6 +3,7 @@ import { HashRouter as Switch, Route, Redirect } from "react-router-dom";
 import ManageWallet from "./WalletManagement";
 import Utility from "./Utility";
 import ETHTest from "./Ethereum";
+import QKCTest from "./QuarkChain";
 import XRPTest from "./XRP";
 import BitcoinTest from "./Bitcoin";
 import BitcoinCashTest from "./BitcoinCash";
@@ -39,6 +40,16 @@ function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
         path="/eth"
         children={
           <ETHTest
+            transport={transport}
+            appPrivateKey={appPrivateKey}
+            appId={appId}
+          />
+        }
+      />
+      <Route
+        path="/qkc"
+        children={
+          <QKCTest
             transport={transport}
             appPrivateKey={appPrivateKey}
             appId={appId}

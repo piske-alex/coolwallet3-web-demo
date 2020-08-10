@@ -31,6 +31,11 @@ function MyNavBar() {
           </Nav.Link>
         </Nav.Item>
         <Nav.Item>
+          <Nav.Link className="NavItem" href="#qkc">
+            QKC
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
           <Nav.Link className="NavItem" href="#btc">
             BTC
           </Nav.Link>
