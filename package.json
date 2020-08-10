@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@coolwallet/btc": "~0.1.0-beta.0",
+    "@coolwallet/bch": "~0.1.0-beta.0",
     "@coolwallet/core": "~0.1.0-beta.0",
     "@coolwallet/eth": "~0.1.0-beta.0",
     "@coolwallet/transport-web-ble": "~0.1.0-beta.0",

@@ -77,7 +77,7 @@ function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
           />
         }
       />
-      {/* <Route
+      <Route
         path="/bch"
         children={
           <BitcoinCashTest
@@ -86,7 +86,7 @@ function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
             appId={appId}
           />
         }
-      /> */}
+      />
     </Switch>
   );
 }
