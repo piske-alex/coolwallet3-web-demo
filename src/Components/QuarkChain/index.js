@@ -9,17 +9,100 @@ import {
   Form,
   Button,
 } from "react-bootstrap";
-import Web3 from "web3";
+import BigNumber from 'bignumber.js';
 import GasMenu from "./GasMenu";
-import cwsETH from "@coolwallet/eth";
+import cwsQKC from "@coolwallet/qkc";
 
-const chainId = 1;
-const web3 = new Web3(
-  "https://mainnet.infura.io/v3/dd7e77cc740a4a32ab3c94d9a08b90ae"
-);
+// const testnet = 'http://jrpc.devnet.quarkchain.io:38391';
+const mainnet = 'http://jrpc.mainnet.quarkchain.io:38391';
+const usedNet = mainnet;
 
-function EthTest({ transport, appPrivateKey, appId }) {
-  const ETH = new cwsETH();
+const request = async (method, params) => {
+	const res = await fetch(usedNet, {
+		headers: {
+			'Content-Type': 'application/json',
+			'Accept': 'application/json',
+		},
+		method: 'POST',
+		body: JSON.stringify({
+			jsonrpc: '2.0',
+			method,
+			params,
+			id: 1,
+		}),
+	});
+	const response = await res.json();
+	return response.result;
+};
+
+/**
+ *
+*/
+async function getNetworkInfo() {
+	const networkInfo = await request('networkInfo');
+	console.log('networkInfo :', networkInfo);
+	return networkInfo;
+}
+
+/**
+ * @param {string} address
+*/
+async function getTransactionCount(address) {
+	const nonce = await request('getTransactionCount', [address]);
+	console.log('nonce :', nonce);
+	return nonce;
+}
+
+/**
+ * @param {string} address
+*/
+async function getBalance(address) {
+	const result = await request('getBalances', [address]);
+	// console.log('result :', result);
+	for (let b of result.balances) {
+		if (b.tokenId === '0x8bb0') {
+			let balance = b.balance;
+			balance = BigNumber(balance, 16).shiftedBy(-18).toFixed();
+			console.log('balance :', balance, 'QKC');
+			return balance;
+		}
+	}
+}
+
+/**
+ * @param {string} address
+*/
+async function getAccountData(address) {
+	const accountData = await request('getAccountData', [address, 'latest', true]);
+	console.log('accountData :', accountData);
+	return accountData;
+}
+
+/**
+ * @param {string} from
+ * @param {string} to
+ * @param {string} value
+ * @param {string} data
+*/
+async function estimateGas(from, to, value, data) {
+	if (!value) value = '0x';
+	if (!data) data = '0x';
+	const estimatedGas = await request('estimateGas', [{from, to, value, data}]);
+	console.log('estimatedGas :', BigNumber(estimatedGas, 16).toFixed());
+	return estimatedGas;
+}
+
+/**
+ * @param {string} shardKey
+*/
+async function getGasPrice(shardKey) {
+	const gasPrice = await request('gasPrice', [shardKey, '0x8bb0']);
+	console.log('gasPrice :', BigNumber(gasPrice, 16).shiftedBy(-18).toFixed(), 'QKC');
+	return gasPrice;
+}
+
+function QKCTest({ transport, appPrivateKey, appId }) {
+  const QKC = new cwsQKC();
 
   const [addressIndex, setAddressIndex] = useState(0);
   const [gasPrice, setGasPrice] = useState(10);
@@ -27,7 +110,7 @@ function EthTest({ transport, appPrivateKey, appId }) {
 
   // sign transaction
   const [address, setAddress] = useState("");
-  const [to, setTo] = useState("0xeb919ADce5908185A6F6C860Ab42812e83ED355A"); // dai
+  const [to, setTo] = useState("0x058B0ce40163ce7a4914111D09F807b12cCA9D8F");
   const [value, setValue] = useState("0");
   const [data, setData] = useState("0x00");
   const [txHash, setHash] = useState("");
@@ -46,11 +129,11 @@ function EthTest({ transport, appPrivateKey, appId }) {
     const addressIdx = parseInt(addressIndex);
     try {
       console.log(transport)
-      const address = await ETH.getAddress(transport, appPrivateKey, appId, addressIdx); //.then((address) => {
+      const address = await QKC.getAddress(transport, appPrivateKey, appId, addressIdx); //.then((address) => {
       setAddress(address);
-      web3.eth.getBalance(address, "pending", (err, balance) => {
-        setBalance(web3.utils.fromWei(balance));
-      });
+      const balance = await getBalance(address);
+      setBalance(balance);
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -69,39 +152,26 @@ function EthTest({ transport, appPrivateKey, appId }) {
     // const data = '0xa9059cbb000000000000000000000000c94f3bebddfc0fd7eac7badb149fad2171b94b6900000000000000000000000000000000000000000000000000000000000003e8'
 
     try {
-      const nonce = await web3.eth.getTransactionCount(address, "pending"); // .then((nonce) => {
+      const nonce = await getTransactionCount(address, "pending");
+      const gasLimit = await estimateGas({ to, data });
+      const gasPrice = await getGasPrice();
 
-      let gasLimit;
-      try {
-        gasLimit = await web3.eth.estimateGas({ to, data }); //, (err, gasLimit) => {
-      } catch (error) {
-        gasLimit = 21000;
-      }
-
-      const gasLimitHex = web3.utils.toHex(gasLimit);
-      const gasPriceHex = web3.utils.toHex(
-        web3.utils.toWei(gasPrice.toString(), "Gwei")
-      );
       const param = {
-        chainId,
-        nonce: web3.utils.toHex(nonce),
-        gasPrice: gasPriceHex,
-        gasLimit: gasLimitHex,
+        chainId: '',
+        nonce,
+        gasPrice,
+        gasLimit,
         to,
-        value: web3.utils.toHex(web3.utils.toWei(value.toString(), "ether")),
+        value: '0x' + BigNumber('1', 10).shiftedBy(18).toString(16),
         data,
         // tokenInfo: {
         //   symbol: 'DAI',
         //   decimals: 18,
         // },
       };
-      const signedTx = await ETH.signTransaction(transport, appPrivateKey, appId, param, addressIndex); //.then((signedTx) => {
+      const signedTx = await QKC.signTransaction(transport, appPrivateKey, appId, param, addressIndex);
       console.log("Signature: " + signedTx)
-      /*web3.eth.sendSignedTransaction(signedTx, (err, txHash) => {
-        if (err) {
-          console.error(err);
-        } else setHash(txHash);
-      });*/
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -112,7 +182,7 @@ function EthTest({ transport, appPrivateKey, appId }) {
   const signMessage = async (message) => {
     setIsSigningMsg(true);
     try {
-      const signature = await ETH.signMessage(message, addressIndex);
+      const signature = await QKC.signMessage(message, addressIndex);
       console.log(`Full Message Signature: ${signature}`);
       setMessageSignature(signature);
     } catch (error) {
@@ -252,4 +322,4 @@ function EthTest({ transport, appPrivateKey, appId }) {
   );
 }
 
-export default EthTest;
+export default QKCTest;
