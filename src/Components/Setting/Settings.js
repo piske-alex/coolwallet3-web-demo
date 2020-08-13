@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Container, InputGroup, FormControl, Row, Col, Button } from 'react-bootstrap';
 import { error as Error, apdu } from '@coolwallet/core';
-import LinearProgress from '@material-ui/core/LinearProgress';
 
 function SettingPage({ appId, appPublicKey, appPrivateKey, transport }) {
   const [password, setPassword] = useState('12345678');

@@ -9,48 +9,58 @@ import {
   Form,
   Button,
 } from "react-bootstrap";
-import Web3 from "web3";
-import GasMenu from "./GasMenu";
 import cwsBNB from "@coolwallet/bnb";
+import axios from "axios";
+import BigNumber from 'bignumber.js';
 
-const chainId = 1;
-const web3 = new Web3(
-  "https://mainnet.infura.io/v3/dd7e77cc740a4a32ab3c94d9a08b90ae"
-);
-
-function BnbTest({ transport, appPrivateKey, appId }) {
+function BNBTest({ transport, appPrivateKey, appId }) {
   const BNB = new cwsBNB();
 
   const [addressIndex, setAddressIndex] = useState(0);
-  const [gasPrice, setGasPrice] = useState(10);
   const [balance, setBalance] = useState(0);
 
   // sign transaction
   const [address, setAddress] = useState("");
-  const [to, setTo] = useState("0xeb919ADce5908185A6F6C860Ab42812e83ED355A"); // dai
+  const [to, setTo] = useState("");
   const [value, setValue] = useState("0");
-  const [data, setData] = useState("0x00");
-  const [txHash, setHash] = useState("");
+  const [fee, setFee] = useState("0");
+  const [accountData, setAccountData] = useState("");
+  const [chainId, setChainId] = useState("");
 
-  // Sign Message
-  const [message, setMessage] = useState("");
-  const [messageSignature, setMessageSignature] = useState("");
 
   // Loading status
   const [isGettingAddress, setIsGettingAddress] = useState(false);
   const [isSigningTransaction, setIsSigningTx] = useState(false);
-  const [isSigningMessage, setIsSigningMsg] = useState(false);
 
   const getAddress = async () => {
     setIsGettingAddress(true);
     const addressIdx = parseInt(addressIndex);
     try {
-      console.log(transport)
       const address = await BNB.getAddress(transport, appPrivateKey, appId, addressIdx); //.then((address) => {
       setAddress(address);
-      web3.eth.getBalance(address, "pending", (err, balance) => {
-        setBalance(web3.utils.fromWei(balance));
-      });
+      axios
+        .get(`https://dex.binance.org/api/v1/account/${address}`)
+        .then(function (response) {
+          // Success
+          console.log("balances: " + JSON.stringify(response.data.balances))
+          setAccountData(response.data)
+          //accountData = response.data
+          const balances = response.data.balances;
+          for (var balance of balances) {
+            if (balance.symbol == 'BNB') {
+              setBalance(balance.free);
+              break;
+            }
+          }
+        });
+
+      axios
+        .get(`https://dex.binance.org/api/v1/node-info`)
+        .then(function (response) {
+          // Success
+          console.log("node-info: " + JSON.stringify(response.data))
+          setChainId(response.data.node_info.network)
+        });
     } catch (error) {
       console.error(error);
     } finally {
@@ -58,67 +68,53 @@ function BnbTest({ transport, appPrivateKey, appId }) {
     }
   };
 
-  const gasHandler = (gasPrice) => {
-    const gasPriceInGWei = gasPrice / 10;
-    setGasPrice(gasPriceInGWei);
-  };
+  const getCoins = (value) => {
+    const coin = {
+      amount: new BigNumber(value).multipliedBy(Math.pow(10, 8)).toNumber(),
+      //parseFloat(value) * Math.pow(10, 8),
+      denom: "BNB"
+    }
+    return coin
+  }
 
   const signTx = async () => {
     setIsSigningTx(true);
-    // transfer dai
-    // const data = '0xa9059cbb000000000000000000000000c94f3bebddfc0fd7eac7badb149fad2171b94b6900000000000000000000000000000000000000000000000000000000000003e8'
-
+    console.log("accountData: " + JSON.stringify(accountData))
     try {
-      const nonce = await web3.eth.getTransactionCount(address, "pending"); // .then((nonce) => {
-
-      let gasLimit;
-      try {
-        gasLimit = await web3.eth.estimateGas({ to, data }); //, (err, gasLimit) => {
-      } catch (error) {
-        gasLimit = 21000;
-      }
-
-      const gasLimitHex = web3.utils.toHex(gasLimit);
-      const gasPriceHex = web3.utils.toHex(
-        web3.utils.toWei(gasPrice.toString(), "Gwei")
-      );
-      const param = {
-        chainId,
-        nonce: web3.utils.toHex(nonce),
-        gasPrice: gasPriceHex,
-        gasLimit: gasLimitHex,
-        to,
-        value: web3.utils.toHex(web3.utils.toWei(value.toString(), "ether")),
-        data,
-        // tokenInfo: {
-        //   symbol: 'DAI',
-        //   decimals: 18,
-        // },
+      const msg = {
+        inputs: [
+          {
+            address: accountData.address,
+            coins: [getCoins(value)],
+          },
+        ],
+        outputs: [
+          {
+            address: to,
+            coins: [getCoins(value)],
+          },
+        ],
       };
-      const signedTx = await BNB.signTransaction(transport, appPrivateKey, appId, param, addressIndex); //.then((signedTx) => {
-      console.log("Signature: " + signedTx)
-      /*web3.eth.sendSignedTransaction(signedTx, (err, txHash) => {
-        if (err) {
-          console.error(err);
-        } else setHash(txHash);
-      });*/
+
+      const signObj = {
+        account_number: accountData.account_number.toString(),
+        chain_id: chainId,
+        data: null,
+        memo: "",
+        msgs: [msg],
+        sequence: accountData.sequence.toString(),
+        source: "711"
+      };
+      console.log("signObj: " + JSON.stringify(signObj));
+      const signHex = Buffer.from(JSON.stringify(signObj), 'ascii').toString('hex')
+      console.log("signHex: " + JSON.stringify(signHex));
+
+      const signedTx = await BNB.signTransaction(transport, appPrivateKey, appId, signHex, addressIndex);
+      console.log("signedTx: " + signedTx);
     } catch (error) {
       console.error(error);
     } finally {
       setIsSigningTx(false);
-    }
-  };
-
-  const signMessage = async (message) => {
-    setIsSigningMsg(true);
-    try {
-      const signature = await BNB.signMessage(message, addressIndex);
-      console.log(`Full Message Signature: ${signature}`);
-      setMessageSignature(signature);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsSigningMsg(false);
     }
   };
 
@@ -164,16 +160,15 @@ function BnbTest({ transport, appPrivateKey, appId }) {
           <Form>
             <Form.Row>
               <Form.Group xs={4} as={Col} controlId="formGridTo">
-                <Form.Label style={{ fontSize: 20 }}>To</Form.Label>
+                <Form.Label style={{ fontSize: 20 }}>To BNB address</Form.Label>
                 <Form.Control
                   value={to}
                   onChange={(event) => {
                     setTo(event.target.value);
                   }}
-                  placeholder="0x..."
+                  placeholder="bnb..."
                 />
               </Form.Group>
-
               <Form.Group xs={4} md={2} as={Col} controlId="Amount">
                 <Form.Label style={{ fontSize: 20 }}>Amount</Form.Label>
                 <Form.Control
@@ -182,28 +177,23 @@ function BnbTest({ transport, appPrivateKey, appId }) {
                   onChange={(event) => {
                     setValue(event.target.value);
                   }}
-                  placeholder="Amount in Eth"
+                  placeholder="Amount in Bnb"
                 />
               </Form.Group>
-              <Form.Group xs={4} as={Col}>
-                <Form.Label style={{ fontSize: 20 }}> Gas (Gwei) </Form.Label>
-                <GasMenu handler={gasHandler}></GasMenu>
-              </Form.Group>
-            </Form.Row>
-
-            <Form.Row>
-              <Form.Group as={Col} xs={10}>
-                <Form.Label style={{ fontSize: 20 }}>Data</Form.Label>
+              <Form.Group xs={4} md={2} as={Col} controlId="Fee">
+                <Form.Label style={{ fontSize: 20 }}>Fee</Form.Label>
                 <Form.Control
-                  value={data}
+                  disabled
+                  type="value"
+                  value={fee}
                   onChange={(event) => {
-                    setData(event.target.value);
+                    setFee(event.target.value);
                   }}
-                  placeholder="0x..."
+                  placeholder="Fee in Bnb"
                 />
               </Form.Group>
               <Form.Group as={Col} xs={2}>
-                <Form.Label style={{ fontSize: 20 }}> Send </Form.Label>
+                <br></br>
                 <Button
                   disabled={isSigningTransaction}
                   variant="outline-success"
@@ -213,43 +203,13 @@ function BnbTest({ transport, appPrivateKey, appId }) {
                 </Button>
               </Form.Group>
             </Form.Row>
+
+            <Form.Row></Form.Row>
           </Form>
-        </Col>
-      </Row>
-      <Row style={{ paddingTop: 20 }}>
-        <Col ms={12}>
-          <p style={{ textAlign: "left", fontSize: 20 }}> {txHash} </p>
-        </Col>
-      </Row>
-      <h4>Sign Message</h4>
-      <Row>
-        <Col xs={4}>
-          <FormControl
-            value={message}
-            placeholder="Message to sign"
-            onChange={(event) => {
-              setMessage(event.target.value);
-            }}
-          ></FormControl>
-        </Col>
-        <Col>
-          <Button
-            disabled={isSigningMessage}
-            variant="outline-success"
-            onClick={() => signMessage(message)}
-          >
-            {isSigningMessage ? "Signing..." : "Sign Message"}
-          </Button>
-        </Col>
-        <Col>
-          <p style={{ textAlign: "left", fontSize: 20 }}>
-            {" "}
-            {messageSignature ? messageSignature.slice(0, 20) + "..." : ""}{" "}
-          </p>
         </Col>
       </Row>
     </Container>
   );
 }
 
-export default BnbTest;
+export default BNBTest;
