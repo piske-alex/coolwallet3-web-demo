@@ -10,7 +10,7 @@ export const getBalances = async addresses => {
 	try {
 		let balances = [];
 		for (let address of addresses) {
-			const res = await fetch(`https://route.cbx.io/api/bch/addr/${address}`);
+			const res = await fetch(`https://dex.binance.org/api/v1/account/${address}`);
 			const resObject = await res.json();
 			balances = balances.concat(new BigNumber(resObject.balance).toFixed());
 		}
