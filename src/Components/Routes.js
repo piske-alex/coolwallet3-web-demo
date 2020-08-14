@@ -4,6 +4,7 @@ import ManageWallet from "./WalletManagement";
 import Setting from "./Setting";
 import Utility from "./Utility";
 import ETHTest from "./Ethereum";
+import ICXTest from "./Icon";
 import XRPTest from "./XRP";
 import BitcoinTest from "./Bitcoin";
 import BitcoinCashTest from "./BitcoinCash";
@@ -81,6 +82,16 @@ function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
         path="/bch"
         children={
           <BitcoinCashTest
+            transport={transport}
+            appPrivateKey={appPrivateKey}
+            appId={appId}
+          />
+        }
+      />
+      <Route
+        path="/icx"
+        children={
+          <ICXTest
             transport={transport}
             appPrivateKey={appPrivateKey}
             appId={appId}
