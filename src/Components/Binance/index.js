@@ -134,7 +134,7 @@ function BNBTest({ transport, appPrivateKey, appId }) {
       var myHeaders = new Headers();
       myHeaders.append("content-type", "text/plain");
 
-      var raw = "data:d60a530a230a141d9fe78a15297c2937c027f9a02f19ce15792d46120b0a03424e4210fe29f4a00012230a14533b2b619782195ca5e9344ab7e7790f52d4956e120b0a03424e4210fe29f4a0001a074d736753656e6412740a26eb5ae987210292bb8dffe308371c080d403eaca0d7bf59ae1b7ecd1f32a47dfaa2bb0c63feed1240286dd5b3647c828f31fd3014af406274fd787b491bdc5668b89e37e90e4cef11274f2f120a59ee9c6b0c357e2fe481eb47a03e069564432ee73789e0f1e19e7918fe16b105002202383020fdc70232055374645478";
+      var raw = transaction;
 
       var requestOptions = {
         method: 'POST',
