@@ -49,6 +49,11 @@ function MyNavBar() {
             BCH
           </Nav.Link>
         </Nav.Item>
+        <Nav.Item>
+          <Nav.Link className="NavItem" href="#icx">
+            ICX
+          </Nav.Link>
+        </Nav.Item>
       </Nav>
     </Navbar>
   );
