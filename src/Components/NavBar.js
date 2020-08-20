@@ -50,6 +50,11 @@ function MyNavBar() {
           </Nav.Link>
         </Nav.Item>
         <Nav.Item>
+          <Nav.Link className="NavItem" href="#bnb">
+            BNB
+            </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
           <Nav.Link className="NavItem" href="#icx">
             ICX
           </Nav.Link>
