@@ -6,6 +6,7 @@ import Utility from "./Utility";
 import ETHTest from "./Ethereum";
 import ICXTest from "./Icon";
 import XRPTest from "./XRP";
+import XLMTest from "./Stellar";
 import BitcoinTest from "./Bitcoin";
 import BitcoinCashTest from "./BitcoinCash";
 
@@ -92,6 +93,16 @@ function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
         path="/icx"
         children={
           <ICXTest
+            transport={transport}
+            appPrivateKey={appPrivateKey}
+            appId={appId}
+          />
+        }
+      />
+      <Route
+        path="/xlm"
+        children={
+          <XLMTest
             transport={transport}
             appPrivateKey={appPrivateKey}
             appId={appId}

@@ -77,7 +77,7 @@ class App extends React.Component {
         cancel action
       </Button>
     )
-      
+
   };
 
   showErrorMessage() {
@@ -102,11 +102,13 @@ class App extends React.Component {
               <Col>
                 <MyNavBar />
               </Col>
-              <p style={{ paddingTop: 15, paddingRight: 10 }}>
-                {this.state.cardName}
-              </p>
+            </Row>
+            <Row style={{ marginLeft: 20 + 'px' }}   >
               {this.showConnectButton()}
               {this.cancelButton()}
+              <p style={{ paddingTop: 15, paddingLeft: 20, paddingRight: 10 }}>
+                {this.state.cardName}
+              </p>
             </Row>
             {this.showErrorMessage()}
           </Container>

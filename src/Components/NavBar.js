@@ -54,6 +54,11 @@ function MyNavBar() {
             ICX
           </Nav.Link>
         </Nav.Item>
+        <Nav.Item>
+          <Nav.Link className="NavItem" href="#xlm">
+            XLM
+          </Nav.Link>
+        </Nav.Item>
       </Nav>
     </Navbar>
   );

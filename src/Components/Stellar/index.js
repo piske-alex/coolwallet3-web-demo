@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import * as Stellar from 'stellar-sdk';
 import {
   Row,
   Col,
@@ -10,39 +11,50 @@ import {
   Button,
 } from "react-bootstrap";
 import * as util from "./util";
-import cwsICX from "@coolwallet/icx";
+import cwsXLM from "@coolwallet/xlm";
 
 
-function ICXTest({ transport, appPrivateKey, appId }) {
-  const ICX = new cwsICX();
+function XLMTest({ transport, appPrivateKey, appId }) {
+  const XLM = new cwsXLM();
 
   const [addressIndex, setAddressIndex] = useState(0);
   const [balance, setBalance] = useState(0);
+  const [fee, setFee] = useState(0);
 
   // sign transaction
   const [address, setAddress] = useState("");
-  const [to, setTo] = useState("hx5295a21c5b97d098ce11f5839311cadaccbae3f6"); // dai
-  const [value, setValue] = useState("0");
+  const [to, setTo] = useState(""); // dai
+  const [value, setValue] = useState("2"); // 不能為0
   const [txHash, setHash] = useState("");
+  const [protocol, setProtocol] = useState("");
 
   // Sign Message
-  const [signedTx, setSignedTx] = useState("");
+  const [tx, setTx] = useState("");
+  const [signatureTx, setSignatureTx] = useState("");
+  const [fundingAccount, setFundingAccount] = useState("");
 
   // Loading status
   const [isGettingAddress, setIsGettingAddress] = useState(false);
   const [isSigningTransaction, setIsSigningTx] = useState(false);
-  const [isSendingTransaction, setIsSendingTx] = useState(false);
+  const [isSendingTx, setIsSendingTx] = useState(false);
+  const [isGettingFee, setIsGettingFee] = useState(false);
 
-  const getAddress = async () => {
+  const getAddress = async (protocol) => {
     setIsGettingAddress(true);
     const addressIdx = parseInt(addressIndex);
     try {
-      console.log(transport);
-      const address = await ICX.getAddress(transport, appPrivateKey, appId, addressIdx); //.then((address) => {
+      console.log("protocol: " + protocol);
+      setProtocol(protocol)
+      const address = await XLM.getAddress(transport, appPrivateKey, appId, addressIdx, protocol); //.then((address) => {
+      console.log("address: " + address);
+      setTo(address);
       setAddress(address);
-      const response = await util.getIconBalance(address);
-      console.log(response)
-      setBalance(response.balance);
+      const balance = await util.getStellarBalance(address);
+      console.log(balance)
+      setBalance(balance);
+      const fee = util.getTransactionFee();
+      console.log(fee)
+      setFee(fee);
     } catch (error) {
       console.error(error);
     } finally {
@@ -50,18 +62,35 @@ function ICXTest({ transport, appPrivateKey, appId }) {
     }
   };
 
+  const getFee = async () => {
+    setIsGettingFee(true);
+    try {
+      const fee = util.getTransactionFee();
+      console.log(fee)
+      setFee(fee);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsGettingFee(false);
+    }
+  };
+
 
   const signTx = async () => {
     setIsSigningTx(true);
-    // transfer dai
-    // const data = '0xa9059cbb000000000000000000000000c94f3bebddfc0fd7eac7badb149fad2171b94b6900000000000000000000000000000000000000000000000000000000000003e8'
-
     try {
+      const toAdd = 'GBCCEUDACKSPOLNYLRA7XEUCHR4ROFZYXGAONDAU3RLFMX5O7GNYNELV'
+      // GATFWI7OGQ37UIFFKGIRFTOPZCIZIXXELTD76CETICSZ7Z63ULWQJZH4
+      const resp = await util.getSignatureBaseAndTx(address, address, fee, value, Stellar.MemoNone, null);
+      console.log(resp.signatureBase)
+      console.log(resp.tx)
+      setTx(resp.tx)
+      setFundingAccount(resp.fundingAccount)
+
+      const signatureTx = await XLM.signTransaction(transport, appPrivateKey, appId, resp.signatureBase, resp.tx, addressIndex, protocol); //.then((signedTx) => {
+      setSignatureTx(signatureTx)
+      console.log(signatureTx)
       
-      const signData = util.getTxData(address, to, value);
-      const signedTx = await ICX.signTransaction(transport, appPrivateKey, appId, signData, addressIndex); //.then((signedTx) => {
-      console.log(signedTx)
-      setSignedTx(signedTx)
     } catch (error) {
       console.error(error);
     } finally {
@@ -69,15 +98,16 @@ function ICXTest({ transport, appPrivateKey, appId }) {
     }
   };
 
+
   const sendTx = async () => {
-    setIsSendingTx(true);
-    try {
-      const resp = await util.sendTransaction(signedTx);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsSendingTx(false);
-    }
+    // setIsSendingTx(true);
+    // try {
+    const resp = await util.sendTransaction(fundingAccount, tx, signatureTx, address);
+    // } catch (error) {
+    //   console.error(error);
+    // } finally {
+    //   setIsSendingTx(false);
+    // }
   };
 
 
@@ -95,23 +125,49 @@ function ICXTest({ transport, appPrivateKey, appId }) {
               placeholder="Index"
               aria-describedby="basic-addon2"
             />
-            <InputGroup.Append>
-              <Button
-                disabled={isGettingAddress}
-                variant="outline-success"
-                compact="true"
-                onClick={getAddress}
-              >
-                {isGettingAddress ? "Loading..." : "Get Address"}
-              </Button>
-            </InputGroup.Append>
           </InputGroup>
+          <Button
+            disabled={isGettingAddress}
+            variant="outline-success"
+            compact="true"
+            onClick={() => getAddress("SLIP0010")}
+          >
+            {isGettingAddress ? "Loading..." : "Get Address SLIP0010"}
+          </Button>
+          <Button
+            disabled={isGettingAddress}
+            variant="outline-success"
+            compact="true"
+            onClick={() => getAddress("BIP44")}
+          >
+            {isGettingAddress ? "Loading..." : "Get Address BIP44"}
+          </Button>
         </Col>
         <Col>
           <FormText style={{ textAlign: "left" }}> From {address} </FormText>
           <FormText style={{ textAlign: "left" }}>
             {" "}
             Balance: {balance}{" "}
+          </FormText>
+        </Col>
+      </Row>
+      <br></br>
+      <h4> Get Fee</h4>
+      <Row>
+        <Col xs={3}>
+          <Button
+            disabled={isGettingFee}
+            variant="outline-success"
+            compact="true"
+            onClick={getFee}
+          >
+            {isGettingFee ? "Loading..." : "Get Fee"}
+          </Button>
+        </Col>
+        <Col>
+          <FormText style={{ textAlign: "left" }}>
+            {" "}
+            Fee: {fee}{" "}
           </FormText>
         </Col>
       </Row>
@@ -155,11 +211,11 @@ function ICXTest({ transport, appPrivateKey, appId }) {
                   {isSigningTransaction ? "Signing Tx..." : "Sign"}
                 </Button>
                 <Button
-                  disabled={isSendingTransaction}
+                  disabled={isSendingTx}
                   variant="outline-success"
                   onClick={sendTx}
                 >
-                  {isSendingTransaction ? "Sending Tx..." : "Send"}
+                  {isSendingTx ? "Sending Tx..." : "Send"}
                 </Button>
               </Form.Group>
             </Form.Row>
@@ -175,4 +231,4 @@ function ICXTest({ transport, appPrivateKey, appId }) {
   );
 }
 
-export default ICXTest;
+export default XLMTest;
