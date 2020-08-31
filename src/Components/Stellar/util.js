@@ -7,6 +7,7 @@ const data = {
 	networkPassphrase: 'Public Global Stellar Network ; September 2015',
 	horizonURL: 'https://horizon.stellar.org',
 }
+
 const server = new Server(data.horizonURL);
 
 /**

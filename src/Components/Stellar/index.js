@@ -79,17 +79,37 @@ function XLMTest({ transport, appPrivateKey, appId }) {
   const signTx = async () => {
     setIsSigningTx(true);
     try {
-      const toAdd = 'GBCCEUDACKSPOLNYLRA7XEUCHR4ROFZYXGAONDAU3RLFMX5O7GNYNELV'
+      // const address = 'GBCCEUDACKSPOLNYLRA7XEUCHR4ROFZYXGAONDAU3RLFMX5O7GNYNELV'
       // GATFWI7OGQ37UIFFKGIRFTOPZCIZIXXELTD76CETICSZ7Z63ULWQJZH4
-      const resp = await util.getSignatureBaseAndTx(address, address, fee, value, Stellar.MemoNone, null);
-      console.log(resp.signatureBase)
-      console.log(resp.tx)
-      setTx(resp.tx)
-      setFundingAccount(resp.fundingAccount)
+      const { signatureBase, tx, fundingAccount } = await util.getSignatureBaseAndTx(address, address, fee, value, Stellar.MemoNone, null);
+      console.log(signatureBase)
+      console.log("resp.signatureBase: " + Buffer.from(signatureBase).toString('hex'))
+      console.log(tx)
+      setTx(tx)
+      setFundingAccount(fundingAccount)
 
-      const signatureTx = await XLM.signTransaction(transport, appPrivateKey, appId, resp.signatureBase, resp.tx, addressIndex, protocol); //.then((signedTx) => {
+      const base = Buffer.from(signatureBase).toString('hex');
+
+      const txData = {
+        from: base.slice(80, 144),
+        to: base.slice(248, 312),
+        amount: value,
+        fee: tx.fee,
+        sequence: tx.sequence,
+        minTime: tx.timeBounds.minTime,
+        maxTime: tx.timeBounds.maxTime,
+        memoType: Stellar.MemoNone,
+        // memo: tx.memo.value,
+        memo: "00",
+        isCreate: true
+      }
+
+      console.log(txData)
+
+      const signatureTx = await XLM.signTransaction(transport, appPrivateKey, appId, signatureBase, txData, addressIndex, protocol); //.then((signedTx) => {
       setSignatureTx(signatureTx)
-      console.log(signatureTx)
+      console.log("signatureTx.transcation: " + signatureTx.transcation)
+      // await util.sendTransaction(resp.fundingAccount, resp.tx, signatureTx.signature, address);
       
     } catch (error) {
       console.error(error);
