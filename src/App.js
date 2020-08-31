@@ -32,6 +32,7 @@ class App extends React.Component {
         const cardName = device.name;
         const transport = await WebBleTransport.connect(device);
         this.setState({ transport, cardName });
+        localStorage.setItem('cardName', cardName)
       } else {
         console.log(error);
       }
@@ -76,7 +77,7 @@ class App extends React.Component {
         cancel action
       </Button>
     )
-      
+
   };
 
   showErrorMessage() {

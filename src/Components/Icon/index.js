@@ -9,36 +9,40 @@ import {
   Form,
   Button,
 } from "react-bootstrap";
-import cwsXRP from "@coolwallet/xrp";
-import axios from "axios";
+import * as util from "./util";
+import cwsICX from "@coolwallet/icx";
 
-function XRPTest({ transport, appPrivateKey, appId }) {
-  const XRP = new cwsXRP();
+
+function ICXTest({ transport, appPrivateKey, appId }) {
+  const ICX = new cwsICX();
 
   const [addressIndex, setAddressIndex] = useState(0);
   const [balance, setBalance] = useState(0);
 
   // sign transaction
   const [address, setAddress] = useState("");
-  const [to, setTo] = useState("rUtYY9mi5XN4Y34tokbDUXPRqheKggCCyX");
+  const [to, setTo] = useState("hx5295a21c5b97d098ce11f5839311cadaccbae3f6"); // dai
   const [value, setValue] = useState("0");
+  const [txHash, setHash] = useState("");
+
+  // Sign Message
+  const [signedTx, setSignedTx] = useState("");
 
   // Loading status
   const [isGettingAddress, setIsGettingAddress] = useState(false);
   const [isSigningTransaction, setIsSigningTx] = useState(false);
+  const [isSendingTransaction, setIsSendingTx] = useState(false);
 
   const getAddress = async () => {
     setIsGettingAddress(true);
     const addressIdx = parseInt(addressIndex);
     try {
-      const address = await XRP.getAddress(transport, appPrivateKey, appId, addressIdx); //.then((address) => {
+      console.log(transport);
+      const address = await ICX.getAddress(transport, appPrivateKey, appId, addressIdx); //.then((address) => {
       setAddress(address);
-      axios
-        .get(`https://data.ripple.com/v2/accounts/${address}/balances`)
-        .then(function (response) {
-          // Success
-          setBalance(response.data.balances[0].value);
-        });
+      const response = await util.getIconBalance(address);
+      console.log(response)
+      setBalance(response.balance);
     } catch (error) {
       console.error(error);
     } finally {
@@ -46,33 +50,35 @@ function XRPTest({ transport, appPrivateKey, appId }) {
     }
   };
 
+
   const signTx = async () => {
     setIsSigningTx(true);
     // transfer dai
     // const data = '0xa9059cbb000000000000000000000000c94f3bebddfc0fd7eac7badb149fad2171b94b6900000000000000000000000000000000000000000000000000000000000003e8'
 
     try {
-      const param = {
-        //TransactionType: , //"Payment"
-        //Flags, //2147483648
-        Sequence: "11", //"0000000b",
-        DestinationTag: "00000000",
-        LastLedgerSequence: "599", //"1b02294797",
-        Amount: (parseFloat(value) * Math.pow(10, 6)).toString(),
-        Fee: "12", //"400000000000000c",
-        //SigningPubKey,
-        //Account,
-        Destination: "rB8rz3nCuHDviKErGMT8xuFHZ8ZvdMfF91",
-      };
-
-      const signedTx = await XRP.signTransaction(transport, appPrivateKey, appId, param, addressIndex); //.then((signedTx) => {
-      console.log("signedTx: " + signedTx);
+      
+      const signData = util.getTxData(address, to, value);
+      const signedTx = await ICX.signTransaction(transport, appPrivateKey, appId, signData, addressIndex); //.then((signedTx) => {
+      console.log(signedTx)
+      setSignedTx(signedTx)
     } catch (error) {
       console.error(error);
     } finally {
       setIsSigningTx(false);
     }
   };
+
+  const sendTx = async () => {
+    try {
+      const resp = await util.sendTransaction(signedTx);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSendingTx(false);
+    }
+  };
+
 
   return (
     <Container style={{ textAlign: "left" }}>
@@ -116,13 +122,13 @@ function XRPTest({ transport, appPrivateKey, appId }) {
           <Form>
             <Form.Row>
               <Form.Group xs={4} as={Col} controlId="formGridTo">
-                <Form.Label style={{ fontSize: 20 }}>Toooo</Form.Label>
+                <Form.Label style={{ fontSize: 20 }}>To</Form.Label>
                 <Form.Control
                   value={to}
                   onChange={(event) => {
                     setTo(event.target.value);
                   }}
-                  placeholder="r..."
+                  placeholder="0x..."
                 />
               </Form.Group>
 
@@ -134,7 +140,7 @@ function XRPTest({ transport, appPrivateKey, appId }) {
                   onChange={(event) => {
                     setValue(event.target.value);
                   }}
-                  placeholder="Amount in Eth"
+                  placeholder="Amount in ICX"
                 />
               </Form.Group>
 
@@ -145,17 +151,27 @@ function XRPTest({ transport, appPrivateKey, appId }) {
                   variant="outline-success"
                   onClick={signTx}
                 >
-                  {isSigningTransaction ? "Signing Tx..." : "Sign & Send"}
+                  {isSigningTransaction ? "Signing Tx..." : "Sign"}
+                </Button>
+                <Button
+                  disabled={isSendingTransaction}
+                  variant="outline-success"
+                  onClick={sendTx}
+                >
+                  {isSendingTransaction ? "Sending Tx..." : "Send"}
                 </Button>
               </Form.Group>
             </Form.Row>
-
-            <Form.Row></Form.Row>
           </Form>
+        </Col>
+      </Row>
+      <Row style={{ paddingTop: 20 }}>
+        <Col ms={12}>
+          <p style={{ textAlign: "left", fontSize: 20 }}> {txHash} </p>
         </Col>
       </Row>
     </Container>
   );
 }
 
-export default XRPTest;
+export default ICXTest;

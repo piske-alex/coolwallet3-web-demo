@@ -12,6 +12,9 @@ function SettingPage({ appId, appPublicKey, appPrivateKey, transport }) {
   const [pairedAPPs, setPairedAPPs] = useState()
   const [pairedAPPID, setPairedAPPID] = useState()
   const [newDeviceName, setNewDeviceName] = useState('')
+  const [AppletExist, setAppletExist] = useState('')
+  const [updateSEStatus, setUpdateSEStatus] = useState('')
+  const [updateMCUStatus, setUpdateMCUStatus] = useState('')
 
   const [isRevokingPassword, setIsRevokingPassword] = useState(false)
   const [isResetting, setIsResetting] = useState(false)
@@ -23,6 +26,7 @@ function SettingPage({ appId, appPublicKey, appPrivateKey, transport }) {
   const [isRemovePairedDevice, setRemovePairedDevice] = useState(false)
   const [isSwitchLockStatus, setSwitchLockStatus] = useState(false)
   const [isRenameDevice, setRenameDevice] = useState(false)
+  const [isAppletExist, setIsAppletExist] = useState(false)
 
   const getPassword = async () => {
     setIsRevokingPassword(true)
@@ -116,13 +120,13 @@ function SettingPage({ appId, appPublicKey, appPrivateKey, transport }) {
       for (let index = 0; index < data.length; index++) {
         const pairedAppId = data[index].appId;
         const pairedAppName = data[index].appName;
-        if (appId !== pairedAppId){
+        if (appId !== pairedAppId) {
           if (dataStr) {
             dataStr = `${dataStr}, ${pairedAppName}: ${pairedAppId} `
           } else {
             dataStr = `${pairedAppName}: ${pairedAppId}`
           }
-        }else {
+        } else {
           console.log(`${pairedAppName}: ${pairedAppId}`)
           setDeviceName(pairedAppName)
         }
@@ -169,7 +173,47 @@ function SettingPage({ appId, appPublicKey, appPrivateKey, transport }) {
     }
   }
 
-  
+  const getApplet = async () => {
+    setIsAppletExist(true)
+    try {
+      const result = await apdu.ota.selectApplet(transport);
+      setAppletExist(`===>${result}`)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsAppletExist(false)
+    }
+  }
+
+  const updateSE = async () => {
+    const cardName = localStorage.getItem('cardName')
+    const result = await apdu.ota.updateSE(transport, cardName.replace('CoolWalletS ', ''), appId, appPrivateKey,
+      function (num) {
+        // setUpdateStatus(<LinearProgress value={num} />);
+        setUpdateSEStatus(num);
+      },
+      function (url, options) {
+        return fetch(url, options);
+      }
+
+    );
+
+    await apdu.mcu.control.powerOff(transport);
+  }
+
+  const updateMCU = async () => {
+    const cardName = localStorage.getItem('cardName')
+    const result = await apdu.mcu.dfu.updateMCU(transport,
+      function (num) {
+        // setUpdateStatus(<LinearProgress value={num} />);
+        setUpdateMCUStatus(num);
+      }
+    );
+
+    await apdu.mcu.control.powerOff(transport);
+  }
+
+
   return (
     <Container>
       <h4>Settings ({deviceName})</h4>
@@ -340,6 +384,46 @@ function SettingPage({ appId, appPublicKey, appPrivateKey, transport }) {
               placeholder='New Device Name'
             />
           </InputGroup>
+        </Col>
+      </Row>
+      <Row>
+        <Col xs={3}>
+          <Button
+            disabled={isAppletExist}
+            variant='outline-light'
+            style={{ margin: 5 }}
+            onClick={getApplet}>
+            {isAppletExist ? 'Loading' : 'Is Applet Exist'}
+          </Button>
+        </Col>
+        <Col cs={3}>
+          {AppletExist}
+        </Col>
+      </Row>
+      <Row>
+        <Col xs={3}>
+          <Button
+            variant='outline-light'
+            style={{ margin: 5 }}
+            onClick={updateSE}>
+            {'update SE'}
+          </Button>
+        </Col>
+        <Col cs={3}>
+          {updateSEStatus}
+        </Col>
+      </Row>
+      <Row>
+        <Col xs={3}>
+          <Button
+            variant='outline-light'
+            style={{ margin: 5 }}
+            onClick={updateMCU}>
+            {'update MCU'}
+          </Button>
+        </Col>
+        <Col cs={3}>
+          {updateMCUStatus}
         </Col>
       </Row>
     </Container>

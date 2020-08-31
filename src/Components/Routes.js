@@ -1,18 +1,32 @@
 import React from "react";
 import { HashRouter as Switch, Route, Redirect } from "react-router-dom";
 import ManageWallet from "./WalletManagement";
+import Setting from "./Setting";
 import Utility from "./Utility";
 import ETHTest from "./Ethereum";
 import QKCTest from "./QuarkChain";
+import ICXTest from "./Icon";
 import XRPTest from "./XRP";
 import BitcoinTest from "./Bitcoin";
+import BinanceTest from "./Binance";
 import BitcoinCashTest from "./BitcoinCash";
 
 function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
   return (
     <Switch>
-      <Redirect from='/' to='/wallet' />
+      <Redirect from='/' to='/setting' />
       <Route
+        path="/setting/"
+        children={
+          <Setting
+            transport={transport}
+            appPrivateKey={appPrivateKey}
+            appPublicKey={appPublicKey}
+            appId={appId}
+          />
+        }
+        appId={appId}
+      />      <Route
         path="/wallet/"
         children={
           <ManageWallet
@@ -80,6 +94,26 @@ function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
         path="/bch"
         children={
           <BitcoinCashTest
+            transport={transport}
+            appPrivateKey={appPrivateKey}
+            appId={appId}
+          />
+        }
+      />
+      <Route
+        path="/bnb"
+        children={
+          <BinanceTest
+            transport={transport}
+            appPrivateKey={appPrivateKey}
+            appId={appId}
+          />
+        }
+      />
+      <Route
+        path="/icx"
+        children={
+          <ICXTest
             transport={transport}
             appPrivateKey={appPrivateKey}
             appId={appId}

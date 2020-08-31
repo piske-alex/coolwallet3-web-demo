@@ -3,7 +3,7 @@ import { Navbar, Nav } from "react-bootstrap";
 import "./NavBar.css";
 
 function MyNavBar() {
-  const [activeTab, setActiveTab] = useState("#wallet");
+  const [activeTab, setActiveTab] = useState("#setting");
 
   return (
     <Navbar variant="dark" expand="lg">
@@ -16,6 +16,10 @@ function MyNavBar() {
         }}
       >
         <Nav.Item>
+          <Nav.Link className="NavItem" href="#setting">
+            Setting
+          </Nav.Link>
+        </Nav.Item>        <Nav.Item>
           <Nav.Link className="NavItem" href="#wallet">
             Wallet
           </Nav.Link>
@@ -48,6 +52,16 @@ function MyNavBar() {
         <Nav.Item>
           <Nav.Link className="NavItem" href="#bch">
             BCH
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link className="NavItem" href="#bnb">
+            BNB
+            </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link className="NavItem" href="#icx">
+            ICX
           </Nav.Link>
         </Nav.Item>
       </Nav>
