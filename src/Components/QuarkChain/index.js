@@ -10,99 +10,9 @@ import {
   Button,
 } from "react-bootstrap";
 import BigNumber from 'bignumber.js';
-import GasMenu from "./GasMenu";
 import cwsQKC from "@coolwallet/qkc";
-
-// const testnet = 'http://jrpc.devnet.quarkchain.io:38391';
-const mainnet = 'http://jrpc.mainnet.quarkchain.io:38391';
-const usedNet = mainnet;
-
-const request = async (method, params) => {
-	const res = await fetch(usedNet, {
-		headers: {
-			'Content-Type': 'application/json',
-			'Accept': 'application/json',
-		},
-		method: 'POST',
-		body: JSON.stringify({
-			jsonrpc: '2.0',
-			method,
-			params,
-			id: 1,
-		}),
-	});
-	const response = await res.json();
-	return response.result;
-};
-
-/**
- *
-*/
-async function getNetworkInfo() {
-	const networkInfo = await request('networkInfo');
-	console.log('networkInfo :', networkInfo);
-	return networkInfo;
-}
-
-/**
- * @param {string} address
-*/
-async function getTransactionCount(address) {
-	const nonce = await request('getTransactionCount', [address]);
-	console.log('nonce :', nonce);
-	return nonce;
-}
-
-/**
- * @param {string} address
-*/
-async function getBalance(address) {
-	const result = await request('getBalances', [address]);
-	// console.log('result :', result);
-	for (let b of result.balances) {
-		if (b.tokenId === '0x8bb0') {
-			let balance = b.balance;
-			balance = BigNumber(balance, 16).shiftedBy(-18).toFixed();
-			console.log('balance :', balance, 'QKC');
-			return balance;
-		}
-	}
-}
-
-/**
- * @param {string} address
-*/
-async function getAccountData(address) {
-	const accountData = await request('getAccountData', [address, 'latest', true]);
-	console.log('accountData :', accountData);
-	return accountData;
-}
-
-/**
- * @param {string} from
- * @param {string} to
- * @param {string} value
- * @param {string} data
-*/
-async function estimateGas(from, to, value, data) {
-	console.log('from :', from);
-	console.log('to :', to);
-	console.log('value :', value);
-	console.log('data :', data);
-	console.log('estimateGas start');
-	if (!value) value = '0x';
-	if (!data) data = '0x';
-	const estimatedGas = await request('estimateGas', [{from, to, value, data}]);
-	console.log('estimatedGas :', BigNumber(estimatedGas, 16).toFixed());
-	return estimatedGas;
-}
-
-/**
- * @param {string} shardKey
-*/
-async function getGasPrice(shardKey) {
-	return await request('gasPrice', [shardKey, '0x8bb0']);
-}
+import { apdu } from "@coolwallet/core";
+import * as util from "./util";
 
 function QKCTest({ transport, appPrivateKey, appId }) {
   const QKC = new cwsQKC();
@@ -137,7 +47,8 @@ function QKCTest({ transport, appPrivateKey, appId }) {
       let address = await QKC.getAddress(transport, appPrivateKey, appId, addressIdx);
 			address = address + '00000000';
       setAddress(address);
-      const balance = await getBalance(address);
+      let balance = await util.getBalance(address);
+      balance = balance ? balance : "0";
       setBalance(balance);
 
     } catch (error) {
@@ -154,10 +65,10 @@ function QKCTest({ transport, appPrivateKey, appId }) {
 
     try {
 			const fromFullShardKey 	= `0x${address.slice(-8)}`;
-      const nonce = await getTransactionCount(address, "pending");
+      const nonce = await util.getTransactionCount(address, "pending");
 			const value = '0x' + BigNumber(amount, 10).shiftedBy(18).toString(16);
-      const gasLimit = await estimateGas(address, to, value, data);
-      const gasPrice = await getGasPrice(fromFullShardKey);
+      const gasLimit = await util.estimateGas(address, to, value, data);
+      const gasPrice = await util.getGasPrice(fromFullShardKey);
 			setGasPrice(gasPrice);
 
       const param = {
@@ -171,9 +82,11 @@ function QKCTest({ transport, appPrivateKey, appId }) {
 				fromFullShardKey,
 				toFullShardKey: `0x${to.slice(-8)}`,
       };
+
+      console.log(param)
       const signedTx = await QKC.signTransaction(transport, appPrivateKey, appId, param, addressIndex);
       console.log("signedTx: " + signedTx)
-
+  
     } catch (error) {
       console.error(error);
     } finally {
@@ -208,7 +121,7 @@ function QKCTest({ transport, appPrivateKey, appId }) {
           </InputGroup>
         </Col>
         <Col>
-          <FormText style={{ textAlign: "left" }}> From {address} </FormText>
+          <FormText style={{ textAlign: "left" }}> From: {address} </FormText>
           <FormText style={{ textAlign: "left" }}>
             {" "}
             Balance: {balance}{" "}
@@ -243,10 +156,6 @@ function QKCTest({ transport, appPrivateKey, appId }) {
                   }}
                   placeholder="Amount in Eth"
                 />
-              </Form.Group>
-              <Form.Group xs={4} as={Col}>
-                <Form.Label style={{ fontSize: 20 }}> Gas (Gwei) </Form.Label>
-			          <FormText style={{ textAlign: "left" }}> {`${BigNumber(gasPrice, 16).shiftedBy(-18).toFixed()} QKC`} </FormText>
               </Form.Group>
             </Form.Row>
 
