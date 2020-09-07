@@ -44,6 +44,7 @@ function SettingPage({ appId, appPublicKey, appPrivateKey, transport }) {
     try {
       setIsRegistering(true)
       const name = 'TestAPP'
+      console.log("appPublicKey: " + appPublicKey)
       const appId = await apdu.pair.register(transport, appPublicKey, password, name);
       setDeviceName(name)
       localStorage.setItem('appId', appId);

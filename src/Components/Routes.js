@@ -4,6 +4,7 @@ import ManageWallet from "./WalletManagement";
 import Setting from "./Setting";
 import Utility from "./Utility";
 import ETHTest from "./Ethereum";
+import QKCTest from "./QuarkChain";
 import ICXTest from "./Icon";
 import XRPTest from "./XRP";
 import BitcoinTest from "./Bitcoin";
@@ -53,6 +54,16 @@ function Routes({ appPublicKey, appPrivateKey, transport, appId }) {
         path="/eth"
         children={
           <ETHTest
+            transport={transport}
+            appPrivateKey={appPrivateKey}
+            appId={appId}
+          />
+        }
+      />
+      <Route
+        path="/qkc"
+        children={
+          <QKCTest
             transport={transport}
             appPrivateKey={appPrivateKey}
             appId={appId}

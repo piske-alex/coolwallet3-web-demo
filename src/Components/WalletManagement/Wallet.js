@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { InputGroup, FormControl, Button, Row, Container, Col } from 'react-bootstrap';
-import { apdu } from '@coolwallet/core';
+import { apdu, util } from '@coolwallet/core';
 const bip39 = require('bip39');
 
 function Wallet({ appId, appPublicKey, appPrivateKey, transport }) {
@@ -36,6 +36,7 @@ function Wallet({ appId, appPublicKey, appPrivateKey, transport }) {
     console.log(mnemonic)
     try {
       const seedHex = bip39.mnemonicToSeedSync(mnemonic).toString('hex');
+      console.log("seedHex: " + seedHex);
       await apdu.wallet.setSeed(transport, appId, appPrivateKey, seedHex)
     } catch(error){
       console.error(error)
@@ -56,7 +57,7 @@ function Wallet({ appId, appPublicKey, appPrivateKey, transport }) {
   const createSeedByApp = async () => {
 
     const crypto = require('crypto');
-    const seedStrPromise = apdu.util.createSeedByApp(12, crypto.randomBytes)
+    const seedStrPromise = util.createSeedByApp(12, crypto.randomBytes)
     
     seedStrPromise.then(function (result) {
         setCreateMnemonic(result)
