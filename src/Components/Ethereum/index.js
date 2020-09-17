@@ -29,16 +29,16 @@ function EthTest({ transport, appPrivateKey, appId }) {
 
   // sign transaction
   const [address, setAddress] = useState('');
-  const [to, setTo] = useState('0xeb919ADce5908185A6F6C860Ab42812e83ED355A'); // dai
+  const [to, setTo] = useState(''); // dai
   const [value, setValue] = useState('0');
   const [data, setData] = useState('0x00');
   const [txHash, setHash] = useState('');
 
   // Sign Message
   const [message, setMessage] = useState('');
-  const [contractERC, setContractERC] = useState('');
-  const [contractMega, setContractMega] = useState('');
-  const [contractMI, setContractMI] = useState('');
+  const [contractERC, setContractERC] = useState('0xAA439A35BC06282fA57025203B823E892a6761Ee');
+  const [contractMega, setContractMega] = useState('0xe5F98aDd6C29a1469b8c5d7b1F977C3a1De3587d');
+  const [contractMI, setContractMI] = useState('0x65869f2cE48dae3568fb3181f432cE902B0F7092');
   const [messageSignature, setMessageSignature] = useState('');
 
   // Loading status
@@ -293,6 +293,18 @@ function EthTest({ transport, appPrivateKey, appId }) {
             messageSignature ? messageSignature.slice(0, 20) + '...' : ''
           } </p>
         </Col>
+      </Row>
+      <Row>
+        Token Contract Address
+      <FormControl
+              onChange={(event) => {
+                setContractERC(event.target.value);
+              }}
+              value={contractERC}
+              placeholder='ERC Contract address'
+              aria-describedby='basic-addon2'
+            />
+      
       </Row>
     </Container>
   );
