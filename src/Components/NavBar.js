@@ -23,7 +23,16 @@ function MyNavBar() {
             history.push('eth');
           }}
         >
-          ETH
+          ETH (MegaWallet)
+        </Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link
+          onClick={() => {
+            history.push('btc');
+          }}
+        >
+          BTC
         </Nav.Link>
       </Nav.Item>
     </Nav>
