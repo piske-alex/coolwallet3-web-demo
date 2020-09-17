@@ -12,6 +12,10 @@ import {
 import Web3 from 'web3';
 import GasMenu from './GasMenu';
 import cwsETH from '@coolwallets/eth';
+import MegaWallet from './mega.json'
+import MultiInput from './mi.json'
+import ERC20Contract from './ERC20.json';
+import BigNumber from 'bignumber.js'
 
 const chainId = 1;
 const web3 = new Web3('https://ropsten.infura.io/v3/dd7e77cc740a4a32ab3c94d9a08b90ae');
@@ -32,6 +36,9 @@ function EthTest({ transport, appPrivateKey, appId }) {
 
   // Sign Message
   const [message, setMessage] = useState('');
+  const [contractERC, setContractERC] = useState('');
+  const [contractMega, setContractMega] = useState('');
+  const [contractMI, setContractMI] = useState('');
   const [messageSignature, setMessageSignature] = useState('');
 
   // Loading status
@@ -60,10 +67,60 @@ function EthTest({ transport, appPrivateKey, appId }) {
     setGasPrice(gasPriceInGWei);
   };
 
+  const calculateInputs = async (amount) => {
+    const mega = new web3.eth.Contract(MegaWallet, contractMega)
+    const erc20 = new web3.eth.Contract(ERC20Contract, contractERC)
+    const addresses = await mega.methods.getWallets().call()
+    const inputsAddr = []
+    const inputsBal = []
+    const balances = {
+      data: await Promise.all(addresses.map(async (address) => {
+        const balance = (await erc20.methods.balanceOf(address).call()).toString()
+        return {address, balance}
+      }))
+    }
+    balances.data = balances.data.sort((a, b) => {
+      if (new BigNumber(a.balance).gt(new BigNumber(b.balance))) return -1
+      else if (new BigNumber(a.balance).lt(new BigNumber(b.balance))) return 1
+      else if (new BigNumber(a.balance).eq(new BigNumber(b.balance))) return 0
+    })
+    if (balances.data.length === 0) {
+      alert('balances not update')
+      return
+    }
+    while (!new BigNumber(amount).lte(new BigNumber(0))) {
+      let count = 0
+      console.log(`amount now ${amount.toString()}`)
+      for (const bal of balances.data) {
+        // if(addresses.includes(bal.address)){
+        if (new BigNumber(bal.balance).lte(new BigNumber(amount))) {
+          inputsAddr.push(bal.address)
+          inputsBal.push(bal.balance)
+          amount = new BigNumber(amount).minus(new BigNumber(bal.balance))
+          balances.data.splice(count, 1)
+          console.log(JSON.stringify(balances.data))
+          break
+        } else if (count === balances.data.length - 1) {
+          inputsAddr.push(balances.data[0].address)
+          inputsBal.push(new BigNumber(amount).toString())
+          amount = 0
+        }
+        count++
+        if (count > 10000) throw 'I am wrong'
+        // }
+      }
+    }
+
+    console.log(inputsAddr)
+    console.log(inputsBal)
+    return { inputsAddr, inputsBal }
+  }
+
   const signTx = async () => {
     setIsSigningTx(true);
-    // transfer dai
-    // const data = '0xa9059cbb000000000000000000000000c94f3bebddfc0fd7eac7badb149fad2171b94b6900000000000000000000000000000000000000000000000000000000000003e8'
+    const mi = new web3.eth.Contract(MultiInput, contractMI)
+    const preTx = await calculateInputs(value)
+    const data = await mi.methods.legacyTransfer(contractMega, contractERC, preTx.inputsAddr, to, preTx.inputsBal).encodeAbi()
 
     try {
       const nonce = await web3.eth.getTransactionCount(address, 'pending'); // .then((nonce) => {
@@ -82,8 +139,8 @@ function EthTest({ transport, appPrivateKey, appId }) {
         nonce: web3.utils.toHex(nonce),
         gasPrice: gasPriceHex,
         gasLimit: gasLimitHex,
-        to,
-        value: web3.utils.toHex(web3.utils.toWei(value.toString(), 'ether')),
+        contractMI,
+        value: 0,
         data,
         // tokenInfo: {
         //   symbol: 'DAI',
