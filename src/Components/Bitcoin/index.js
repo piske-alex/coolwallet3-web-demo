@@ -8,7 +8,7 @@ import FormControl from 'react-bootstrap/FormControl';
 import Container from 'react-bootstrap/Container';
 import cwsBTC from '@coolwallets/btc';
 
-import { getBTCBalance, getBTCUTXO } from './utils'
+import { getBTCBalance, getBTCUTXO, getUTXOs as UtilsGetUTXOs } from './utils'
 
 
 function BitcoinTest({ transport, appPrivateKey, appId }) {
@@ -95,47 +95,20 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
 
   const getUTXOs = async () => {
     const addInd = parseInt(localStorage.getItem(`${profile}-index`))
-
+    console.log(addInd)
     console.log(`start getting utxos ${addInd}`)
-    const balance = 0
+    const addressesToScan = []
+
     for(let i =0; i<addInd; i++) {
-      console.log(log)
-      const newLog = log+"\nGetting UTXO for Address "+i
-      setLog(newLog)
-      console.log(newLog)
-      const utxos = await getBTCUTXO(localStorage.getItem(`${profile}-${i}`))
-      if(utxos.unspent_outputs.length>0) {
-        if(localStorage.getItem(`${profile}-utxos`)){
-          let existingUTXOs = JSON.parse(localStorage.getItem(`${profile}-utxos`))
-          let existFlag = false
-          for(let k in utxos.unspent_outputs) {
-            for(let j in existingUTXOs) {
-              if(existingUTXOs[j].tx_hash+existingUTXOs[j].tx_output_n === utxos.unspent_outputs[k].tx_hash+utxos.unspent_outputs[k].tx_output_n) {
-                existFlag = true
-              }
-            }
-            if(!existFlag) {
-              utxos.unspent_outputs[k].addressIndexCoolWallet = i
-              existingUTXOs.push(utxos.unspent_outputs[k])
-            }
-          }
-          localStorage.setItem(`${profile}-utxos`, JSON.stringify(existingUTXOs))
-          setUTXOs(existingUTXOs)
-        }else {
-            let existingUTXOs = []
-            existingUTXOs = existingUTXOs.concat(utxos.unspent_outputs.map((v) => {
-              v.addressIndexCoolWallet = i
-              return v
-            }))
-            localStorage.setItem(`${profile}-utxos`, JSON.stringify(existingUTXOs))
-            setUTXOs(existingUTXOs)
-        }
-        console.log(utxos)
-      }
-      await new Promise((res) => {
-        setTimeout(res,500)
-      })
+      addressesToScan.push(localStorage.getItem(`${profile}-${i}`))
     }
+    console.log(addressesToScan)
+    const {balance, utxos} = await UtilsGetUTXOs(addressesToScan)
+    console.log(balance)
+    console.log(utxos)
+    localStorage.setItem(`${profile}-utxos`, utxos)
+    setBalance(balance)
+    setUTXOs(utxos)
   }
 
   return (
@@ -188,7 +161,7 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
         </Col>
         <Col>
           <FormText style={{ textAlign: 'left' }}> From {address} </FormText>
-          <FormText style={{ textAlign: 'left' }}> Balance: {balance} </FormText>
+          <FormText style={{ textAlign: 'left' }}> Balance: {balance} satoshis</FormText>
         </Col>
       </Row>
       <Row>
