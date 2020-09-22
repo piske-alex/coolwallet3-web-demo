@@ -14,7 +14,31 @@ const getBTCUTXO = async (address) => {
   } catch (e) {
     return {unspent_outputs:[]}
   }
-  
+};
+
+//https://bitcoinfees.earn.com/api/v1/fees/recommended
+export const getBTCfee = async (address) => {
+  try{
+    const response = await (
+      await fetch(`https://cors-anywhere.herokuapp.com/bitcoinfees.earn.com/api/v1/fees/recommended`)
+    ).json()
+    return response
+  } catch (e) {
+    return { "fastestFee": '0', "halfHourFee": '0', "hourFee": '0' }
+  }
+};
+//blockchain.info/pushtx?tx=
+export const pushTX = async (tx) => {
+  try{
+    const response = await (
+      await fetch(`https://blockchain.info/pushtx?tx=${tx}`,{
+        method: 'POST'
+    })
+    ).text()
+    return response
+  } catch (e) {
+    return e
+  }
 };
 
 /***
@@ -50,10 +74,10 @@ const utxoReducer = (result,utxo) => {
       addressIndex: utxo.addressIndexCoolWallet
     })
     if (result.amountToSend > utxo.value) {
-      result.amountToSend -= (utxo.value - 93*fee)
+      result.amountToSend -= (utxo.value - 93*result.fee)
       console.log(result.amountToSend)
     } else {
-      result.change = utxo.value - result.amountToSend - 93*fee
+      result.change = utxo.value - result.amountToSend - 93*result.fee
       result.amountToSend = 0
     }
   }
@@ -67,18 +91,18 @@ const utxoSweepReducer = (result,utxo) => {
       preValue: utxo.value,
       addressIndex: utxo.addressIndexCoolWallet
     })
-    result.sendAmount += utxo.value - 93*fee
+    result.sendAmount += utxo.value - 93*result.fee
   return result
 }
 
 const calcInput = (existingUTXOs, amountToSend, fee, sendDust) => {
     const txFee = 79*fee
     console.log(txFee)
-    return existingUTXOs.filter((utxo) => (sendDust? utxo.value > 93*fee: true)).reduce(utxoReducer, {inputs:[], change:0, amountToSend: amountToSend + txFee});
+    return existingUTXOs.filter((utxo) => (sendDust? utxo.value > 93*fee: true)).reduce(utxoReducer, {inputs:[], change:0, amountToSend: amountToSend + txFee, fee});
 }
 
 const calcSweepInput = (existingUTXOs, fee, sendDust) => {
-  return existingUTXOs.filter((utxo) => (sendDust? utxo.value > 93*fee: true)).reduce(utxoSweepReducer, {inputs:[], sendAmount: -79*fee});
+  return existingUTXOs.filter((utxo) => (sendDust? utxo.value > 93*fee: true)).reduce(utxoSweepReducer, {inputs:[], sendAmount: -79*fee, fee});
 }
 
 export const sweep = (existingUTXOs, toAddress, fee, sendDust=false) => {

@@ -8,7 +8,7 @@ import FormControl from 'react-bootstrap/FormControl';
 import Container from 'react-bootstrap/Container';
 import cwsBTC from '@coolwallets/btc';
 
-import { getBTCBalance, getBTCUTXO, getBalance as UtilsGetUTXOs, sweep, transfer } from './utils'
+import { getBTCBalance, pushTX, getBTCfee, getBalance as UtilsGetUTXOs, sweep, transfer } from './utils'
 
 
 function BitcoinTest({ transport, appPrivateKey, appId }) {
@@ -58,6 +58,9 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
     console.log(tx)
     const newLog = log+"\nPut the below to blockcypher raw tx push \n"+tx
     setLog(newLog)
+    // eslint-disable-next-line no-restricted-globals
+    if(confirm('push tx now? push to blockchain')) pushTX(tx)
+
   }
 
   const getRawTx = async () => {
@@ -76,6 +79,8 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
     console.log(tx)
     const newLog = log+"\nPut the below to blockcypher raw tx push \n"+tx
     setLog(newLog)
+    // eslint-disable-next-line no-restricted-globals
+    if(confirm('push tx now? push to blockchain')) pushTX(tx)
   };
 
   const populateLocalStorage = async () => {
@@ -105,10 +110,15 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
     const {balance, utxos} = await UtilsGetUTXOs(addressesToScan)
     console.log(balance)
     console.log(utxos)
-    localStorage.setItem(`${profile}-utxos`, utxos)
+    localStorage.setItem(`${profile}-utxos`, JSON.stringify(utxos))
     setBalance(balance)
     setUTXOs(utxos)
   }
+
+  React.useEffect(async () => {
+    const fee = (await getBTCfee()).halfHourFee
+    setFee(fee)
+  }, []);
 
   return (
     <Container style={{ textAlign: 'left' }}>
