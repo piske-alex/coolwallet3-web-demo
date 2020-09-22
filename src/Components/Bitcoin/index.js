@@ -8,7 +8,7 @@ import FormControl from 'react-bootstrap/FormControl';
 import Container from 'react-bootstrap/Container';
 import cwsBTC from '@coolwallets/btc';
 
-import { getBTCBalance, getBTCUTXO, getUTXOs as UtilsGetUTXOs } from './utils'
+import { getBTCBalance, getBTCUTXO, getBalance as UtilsGetUTXOs, sweep, transfer } from './utils'
 
 
 function BitcoinTest({ transport, appPrivateKey, appId }) {
@@ -41,42 +41,41 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
     
   };
 
-  const getRawTx = async () => {
-    
+  const getRawTxSweep = async () => {
     let existingUTXOs = JSON.parse(localStorage.getItem(`${profile}-utxos`))
     const amountToSend = parseInt(amount)
     console.log(amountToSend)
 
-    const txFee = 79*parseInt(fee)
+    const txFee = parseInt(fee)
     console.log(txFee)
-    const preTx = existingUTXOs.filter((utxo) => (utxo.value > 93*fee)).reduce((result,utxo) => {
-      if (result.amountToSend > 0) {
-        result.inputs.push({
-          preTxHash: utxo.tx_hash_big_endian,
-          preIndex: utxo.tx_output_n,
-          preValue: utxo.value,
-          addressIndex: utxo.addressIndexCoolWallet
-        })
-        if (result.amountToSend > utxo.value) {
-          result.amountToSend -= (utxo.value - 93*fee)
-          console.log(result.amountToSend)
-        } else {
-          result.change = utxo.value - result.amountToSend - 93*fee
-          result.amountToSend = 0
-        }
-      }
-      return result
-    },{inputs:[], change:0, amountToSend: amountToSend + txFee});
+    const preTx = sweep(existingUTXOs, destination, txFee)
     
     console.log(preTx)
-    if(preTx.amountToSend > 0 )alert('not enough balance')
+    
     const ScriptType = BTC.ScriptType.P2SH_P2WPKH;
     console.log('getting now')
-    const tx = await BTC.signTransaction(ScriptType, preTx.inputs, {value: amountToSend,address: destination}, {value: preTx.change, addressIndex:0})
-    console.log('osidfj')
+    const tx = await BTC.signTransaction(ScriptType, preTx.inputs, preTx.output, preTx.change)
     console.log(tx)
     const newLog = log+"\nPut the below to blockcypher raw tx push \n"+tx
-      setLog(newLog)
+    setLog(newLog)
+  }
+
+  const getRawTx = async () => {
+    let existingUTXOs = JSON.parse(localStorage.getItem(`${profile}-utxos`))
+    const amountToSend = parseInt(amount)
+    console.log(amountToSend)
+
+    const txFee = parseInt(fee)
+    console.log(txFee)
+    const preTx = transfer(existingUTXOs, destination, amountToSend, txFee)
+    console.log(preTx)
+    
+    const ScriptType = BTC.ScriptType.P2SH_P2WPKH;
+    console.log('getting now')
+    const tx = await BTC.signTransaction(ScriptType, preTx.inputs, preTx.output, preTx.change)
+    console.log(tx)
+    const newLog = log+"\nPut the below to blockcypher raw tx push \n"+tx
+    setLog(newLog)
   };
 
   const populateLocalStorage = async () => {
@@ -203,6 +202,9 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
         
         <Button variant='outline-success' compact='true' onClick={getRawTx}>
                 get raw transaction
+              </Button>
+              <Button variant='outline-success' compact='true' onClick={getRawTxSweep}>
+                get raw transaction (sweep)
               </Button>
       </Row>
       <Row>
