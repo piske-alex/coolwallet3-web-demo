@@ -8,13 +8,14 @@ import FormControl from 'react-bootstrap/FormControl';
 import Container from 'react-bootstrap/Container';
 import cwsBTC from '@coolwallets/btc';
 
-import { getBTCBalance, pushTX, getBTCfee, getBalance as UtilsGetUTXOs, sweep, transfer } from './utils'
+import { getBTCBalance, pushTX, getBTCfee, getBalance as UtilsGetUTXOs, sweep, transfer, yPubToAddress } from './utils'
 
 
 function BitcoinTest({ transport, appPrivateKey, appId }) {
   const BTC = new cwsBTC(transport, appPrivateKey, appId);
 
   const [addressIndex, setAddressIndex] = useState(0);
+  const [ypub, setYpub] = useState('');
   const [balance, setBalance] = useState(0);
 
   const [address, setAddress] = useState('');
@@ -97,17 +98,22 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
     localStorage.setItem(`${profile}-index`,addressIndex)
   }
 
-  const getUTXOs = async () => {
-    const addInd = parseInt(localStorage.getItem(`${profile}-index`))
-    console.log(addInd)
-    console.log(`start getting utxos ${addInd}`)
-    const addressesToScan = []
+  const populateLocalStorageYpub = async () => {
+    console.log('setring ypub')
+    localStorage.setItem(`${profile}-addresses`, JSON.stringify(yPubToAddress(ypub, addressIndex)))
+  }
 
-    for(let i =0; i<addInd; i++) {
-      addressesToScan.push(localStorage.getItem(`${profile}-${i}`))
-    }
-    console.log(addressesToScan)
-    const {balance, utxos} = await UtilsGetUTXOs(addressesToScan)
+  const getUTXOs = async () => {
+    // const addInd = parseInt(localStorage.getItem(`${profile}-index`))
+    // console.log(addInd)
+    // console.log(`start getting utxos ${addInd}`)
+    // const addressesToScan = []
+
+    // for(let i =0; i<addInd; i++) {
+    //   addressesToScan.push(localStorage.getItem(`${profile}-${i}`))
+    // }
+    // console.log(addressesToScan)
+    const {balance, utxos} = await UtilsGetUTXOs(JSON.parse(localStorage.getItem(`${profile}-addresses`)))
     console.log(balance)
     console.log(utxos)
     localStorage.setItem(`${profile}-utxos`, JSON.stringify(utxos))
@@ -161,6 +167,19 @@ function BitcoinTest({ transport, appPrivateKey, appId }) {
             <InputGroup.Append>
               <Button variant='outline-success' compact='true' onClick={populateLocalStorage}>
                 Populate Address
+              </Button>
+            </InputGroup.Append>
+            <FormControl
+              onChange={(event) => {
+                setYpub(event.target.value);
+              }}
+              value={ypub}
+              placeholder='ypub'
+              aria-describedby='basic-addon2'
+            />
+            <InputGroup.Append>
+              <Button variant='outline-success' compact='true' onClick={populateLocalStorageYpub}>
+                Populate Address with ypub
               </Button>
             </InputGroup.Append>
           </InputGroup>
